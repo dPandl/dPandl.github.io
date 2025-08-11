@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>by-dp.de - Digitale Lösungen</title>
+    <script>
+      // On page load or when changing themes, best to add inline in `head` to avoid FOUC.
+      // Default to dark mode if no theme is set or if cookie consent has not been given.
+      if (localStorage.getItem('by-dp-cookie-consent') === 'accepted' && localStorage.getItem('theme') === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
+
+<link rel="stylesheet" href="/index.css">
+  <script type="module" crossorigin src="/assets/index-dr99jTyq.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-C1tfxzMk.css">
+</head>
+  <body class="bg-gray-50 dark:bg-gray-900">
+    <div id="root"></div>
+</body>
+</html>
