@@ -436,35 +436,35 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
                 </div>
 
                 {/* Features Highlights */}
-                <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700">
+                <div className="p-3.5 sm:p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700">
                     <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
                         Highlights / Features
                     </label>
-                    <div className="flex gap-2 mb-3">
+                    <div className="flex flex-col sm:flex-row gap-2 mb-3">
                         <input
                             type="text"
                             placeholder="Neues Feature Stichwort..."
                             value={featureInput}
                             onChange={(e) => setFeatureInput(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddFeature(); } }}
-                            className="flex-grow px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white"
+                            className="w-full sm:flex-grow px-4 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-sm text-gray-900 dark:text-white"
                         />
                         <button
                             type="button"
                             onClick={handleAddFeature}
-                            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 text-gray-800 dark:text-white font-bold rounded-xl text-sm transition-colors"
+                            className="w-full sm:w-auto px-4 py-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 text-gray-800 dark:text-white font-bold rounded-xl text-sm transition-colors shrink-0"
                         >
                             + Hinzufügen
                         </button>
                     </div>
                     <ul className="space-y-2">
                         {formData.features?.map((feat, idx) => (
-                            <li key={idx} className="flex items-center justify-between px-3 py-1.5 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs">
-                                <span className="text-gray-700 dark:text-gray-300">✓ {feat}</span>
+                            <li key={idx} className="flex items-center justify-between px-3 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-xs">
+                                <span className="text-gray-700 dark:text-gray-300 pr-2 break-words">✓ {feat}</span>
                                 <button
                                     type="button"
                                     onClick={() => handleRemoveFeature(idx)}
-                                    className="text-rose-500 font-bold hover:text-rose-700 px-2"
+                                    className="text-rose-500 font-bold hover:text-rose-700 p-1 shrink-0"
                                 >
                                     ✕
                                 </button>
@@ -474,8 +474,8 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
                 </div>
 
                 {/* GitHub Deployment Info Hint */}
-                <div className="p-3.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-xs text-cyan-700 dark:text-cyan-300 flex items-center gap-2.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-cyan-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="p-3.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-xs text-cyan-700 dark:text-cyan-300 flex items-start gap-2.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-cyan-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span>
@@ -484,11 +484,11 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
                 </div>
 
                 {/* Submit Actions */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+                <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-3 pt-4 border-t border-gray-100 dark:border-gray-700">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-2xl text-sm"
+                        className="w-full sm:w-auto px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold rounded-2xl text-sm"
                     >
                         Abbrechen
                     </button>
@@ -496,7 +496,7 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
                     <button
                         type="submit"
                         disabled={isSaving}
-                        className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-cyan-500/25 transition-all text-sm flex items-center gap-2 disabled:opacity-50"
+                        className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-cyan-500/25 transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50"
                     >
                         {isSaving ? (
                             <>
