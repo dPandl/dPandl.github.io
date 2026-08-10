@@ -255,24 +255,21 @@ async function enrichWithGitHubReleases(projectsList: Project[]): Promise<Projec
                     const release = await res.json();
                     const version = release.tag_name ? release.tag_name.replace(/^v/, '') : project.version;
                     
-                    // Look for asset zip/exe or fallback to zipball
                     let downloadUrl = project.downloadUrl;
                     let downloadFilename = project.downloadFilename;
                     
+                    // Only attach download URL if the release actually has built release assets (.exe / .zip)
                     if (release.assets && release.assets.length > 0) {
                         const asset = release.assets[0];
                         downloadUrl = asset.browser_download_url;
                         downloadFilename = asset.name;
-                    } else if (release.zipball_url) {
-                        downloadUrl = release.zipball_url;
-                        downloadFilename = `${project.id}-${version}.zip`;
                     }
 
                     return {
                         ...project,
                         version: version || project.version,
-                        downloadUrl: downloadUrl || project.downloadUrl,
-                        downloadFilename: downloadFilename || project.downloadFilename
+                        downloadUrl: downloadUrl,
+                        downloadFilename: downloadFilename
                     };
                 }
             } catch (e) {
