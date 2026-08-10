@@ -24,11 +24,14 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
     return (
         <div 
             className="fixed inset-0 bg-gray-900/60 backdrop-blur-md z-50 flex justify-center items-center p-2 sm:p-4 transition-opacity duration-300 overflow-hidden"
-            onClick={onClose}
+            onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                    onClose();
+                }
+            }}
         >
             <div 
                 className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl w-full max-w-3xl max-h-[92vh] flex flex-col transition-colors duration-300 overflow-hidden border border-gray-200 dark:border-gray-700"
-                onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex justify-between items-center px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-200 dark:border-gray-700 shrink-0">
                     <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white pr-2 truncate">{title}</h2>

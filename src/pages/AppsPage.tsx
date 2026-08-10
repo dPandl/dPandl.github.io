@@ -6,12 +6,14 @@ interface AppsPageProps {
     onSelectApp?: (app: Project) => void;
     isAdmin?: boolean;
     onAddNewApp?: () => void;
+    onReloadProjects?: () => Promise<void> | void;
 }
 
-const AppsPage: React.FC<AppsPageProps> = ({ onSelectApp, isAdmin, onAddNewApp }) => {
+const AppsPage: React.FC<AppsPageProps> = ({ onSelectApp, isAdmin, onAddNewApp, onReloadProjects }) => {
     const [projectList, setProjectList] = useState<Project[]>(fallbackProjects);
     const [searchQuery, setSearchQuery] = useState('');
     const [activeCategory, setActiveCategory] = useState<string>('Alle');
+    const [isReloading, setIsReloading] = useState(false);
 
     useEffect(() => {
         let isMounted = true;
@@ -20,6 +22,16 @@ const AppsPage: React.FC<AppsPageProps> = ({ onSelectApp, isAdmin, onAddNewApp }
         });
         return () => { isMounted = false; };
     }, []);
+
+    const handleReload = async () => {
+        setIsReloading(true);
+        if (onReloadProjects) {
+            await onReloadProjects();
+        }
+        const data = await fetchProjects();
+        setProjectList(data);
+        setIsReloading(false);
+    };
 
     // Automatically extract all unique categories present in the projects list
     const dynamicCategories = useMemo(() => {
@@ -136,15 +148,28 @@ const AppsPage: React.FC<AppsPageProps> = ({ onSelectApp, isAdmin, onAddNewApp }
                     </div>
 
                     {isAdmin && (
-                        <button
-                            onClick={onAddNewApp}
-                            className="w-full sm:w-auto px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all shrink-0 flex items-center justify-center gap-2 text-base"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                            </svg>
-                            Neue App hinzufügen
-                        </button>
+                        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                            <button
+                                onClick={handleReload}
+                                disabled={isReloading}
+                                title="projekte.json neu vom Server / GitHub laden"
+                                className="w-full sm:w-auto px-5 py-4 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 font-bold rounded-2xl border border-cyan-500/20 transition-all shrink-0 flex items-center justify-center gap-2 text-base disabled:opacity-50"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${isReloading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                </svg>
+                                {isReloading ? 'Lade neu...' : 'JSON neu laden'}
+                            </button>
+                            <button
+                                onClick={onAddNewApp}
+                                className="w-full sm:w-auto px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all shrink-0 flex items-center justify-center gap-2 text-base"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                                </svg>
+                                Neue App hinzufügen
+                            </button>
+                        </div>
                     )}
                 </div>
 

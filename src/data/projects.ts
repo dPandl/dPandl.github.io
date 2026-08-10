@@ -316,6 +316,35 @@ export async function fetchProjects(): Promise<Project[]> {
     const timestamp = Date.now();
     let loadedProjects: Project[] = initialProjects;
 
+    // 0. If admin token exists, fetch directly via GitHub REST API (always 100% immediate & real-time)
+    const adminToken = localStorage.getItem('by_dp_github_token');
+    if (adminToken) {
+        try {
+            const url = `https://api.github.com/repos/dPandl/dPandl.github.io/contents/projects.json?t=${timestamp}`;
+            const authHeader = adminToken.startsWith('ghp_') || adminToken.startsWith('github_pat_') ? `Bearer ${adminToken}` : `token ${adminToken}`;
+            const apiRes = await fetch(url, {
+                headers: { 'Authorization': authHeader, 'Accept': 'application/vnd.github.v3+json' }
+            });
+            if (apiRes.ok) {
+                const apiData = await apiRes.json();
+                if (apiData.content) {
+                    const binary = atob(apiData.content.replace(/\s/g, ''));
+                    const bytes = new Uint8Array(binary.length);
+                    for (let i = 0; i < binary.length; i++) {
+                        bytes[i] = binary.charCodeAt(i);
+                    }
+                    const text = new TextDecoder('utf-8').decode(bytes);
+                    const parsed = JSON.parse(text);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        return await enrichWithGitHubReleases(parsed);
+                    }
+                }
+            }
+        } catch (err) {
+            console.warn('GitHub REST API direct fetch failed, falling back to public files:', err);
+        }
+    }
+
     // 1. Try local relative fetch with cache-busting
     try {
         const response = await fetch(`./projects.json?t=${timestamp}`);

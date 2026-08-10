@@ -114,17 +114,24 @@ const App: React.FC = () => {
         }
 
         await commitProjectsToGitHub(updatedList, `App updated/created: ${projectToSave.title}`);
-        setProjectList(updatedList);
+        const freshList = await fetchProjects();
+        setProjectList(freshList.length > 0 ? freshList : updatedList);
     };
 
     const handleDeleteProject = async () => {
         if (!deletingProject) return;
         const updatedList = projectList.filter(p => p.id !== deletingProject.id);
         await commitProjectsToGitHub(updatedList, `App deleted: ${deletingProject.title}`);
-        setProjectList(updatedList);
+        const freshList = await fetchProjects();
+        setProjectList(freshList.length > 0 ? freshList : updatedList);
         if (route.selectedAppId === deletingProject.id) {
             window.location.hash = '#apps';
         }
+    };
+
+    const handleReloadProjects = async () => {
+        const data = await fetchProjects();
+        setProjectList(data);
     };
 
     const selectedApp: Project | undefined = route.selectedAppId 
@@ -147,6 +154,7 @@ const App: React.FC = () => {
                             setEditingProject(null);
                             openModal('projectForm');
                         }}
+                        onReloadProjects={handleReloadProjects}
                         onSelectApp={(app) => {
                             window.location.hash = `#app/${app.id}`;
                         }}
