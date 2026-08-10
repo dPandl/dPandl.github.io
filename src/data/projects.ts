@@ -284,22 +284,7 @@ export async function fetchProjects(): Promise<Project[]> {
     const timestamp = Date.now();
     let loadedProjects: Project[] = initialProjects;
 
-    // 1. Primary source: Fetch live projects.json directly from GitHub main branch (where Web-Admin commits)
-    try {
-        const rawUrl = `https://raw.githubusercontent.com/dPandl/dPandl.github.io/main/projects.json?t=${timestamp}`;
-        const rawResponse = await fetch(rawUrl);
-        if (rawResponse.ok) {
-            const rawData = await rawResponse.json();
-            if (Array.isArray(rawData) && rawData.length > 0) {
-                loadedProjects = rawData;
-                return await enrichWithGitHubReleases(loadedProjects);
-            }
-        }
-    } catch (e) {
-        console.warn('Raw GitHub fetch failed, trying local fallback:', e);
-    }
-
-    // 2. Secondary fallback: Local relative fetch
+    // 1. Try local relative fetch with cache-busting
     try {
         const response = await fetch(`./projects.json?t=${timestamp}`);
         if (response.ok) {
@@ -310,6 +295,19 @@ export async function fetchProjects(): Promise<Project[]> {
         }
     } catch (e) {
         console.warn('Local projects.json fetch failed:', e);
+        // 2. Fallback to raw GitHub main branch
+        try {
+            const rawUrl = `https://raw.githubusercontent.com/dPandl/dPandl.github.io/main/projects.json?t=${timestamp}`;
+            const rawResponse = await fetch(rawUrl);
+            if (rawResponse.ok) {
+                const rawData = await rawResponse.json();
+                if (Array.isArray(rawData) && rawData.length > 0) {
+                    loadedProjects = rawData;
+                }
+            }
+        } catch (e2) {
+            console.warn('Raw GitHub fetch failed:', e2);
+        }
     }
 
     // Automatically fetch latest GitHub release version and download URL for apps with githubRepo specified
