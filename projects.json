@@ -251,27 +251,23 @@
   {
     "id": "webapp-sandbox",
     "title": "WebApp Sandbox",
-    "tagline": "Experimentelle Web-Technologien & APIs testen.",
+    "tagline": "",
     "description": "Ein sicherer Ort, um Web-Technologien und APIs zu testen und zu experimentieren.",
-    "longDescription": "Die WebApp Sandbox ist eine Spielwiese für moderne Web-APIs (Web Bluetooth, Web Share, Service Worker, WebGL). Entwickler und Interessierte können hier experimentelle Features ausprobieren.",
+    "longDescription": "Eine App um html alApps auf deinem Gerät zu installieren.",
     "color": "#f59e0b",
     "category": "Tools",
-    "version": "0.5.0",
+    "version": "0",
     "releaseDate": "In Kürze",
     "updatedDate": "01.08.2024",
-    "supportedPlatforms": "desktop",
+    "supportedPlatforms": "both",
     "developer": "by-dp",
+    "isFeatured": false,
     "icon": "",
     "openUrl": "",
     "downloadUrl": "",
     "downloadFilename": "",
     "status": "In Entwicklung",
-    "features": [
-      "Live Code Editor & Preview",
-      "Zugriff auf moderne Browser APIs",
-      "Performance Benchmark-Tools"
-    ],
-    "screenshots": [],
-    "isFeatured": false
+    "features": [],
+    "screenshots": []
   }
 ]
