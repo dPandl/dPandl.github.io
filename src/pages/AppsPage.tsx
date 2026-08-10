@@ -101,8 +101,16 @@ const AppsPage: React.FC<AppsPageProps> = ({ onSelectApp, isAdmin, onAddNewApp }
                                 </div>
                             </div>
 
-                            <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-4xl sm:text-5xl font-extrabold shadow-xl shrink-0">
-                                {featuredApp.title.substring(0, 2).toUpperCase()}
+                            <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-4xl sm:text-5xl font-extrabold shadow-xl shrink-0 overflow-hidden">
+                                {featuredApp.icon ? (
+                                    <img 
+                                        src={featuredApp.icon} 
+                                        alt={featuredApp.title} 
+                                        className="w-full h-full object-cover rounded-3xl" 
+                                    />
+                                ) : (
+                                    featuredApp.title.substring(0, 2).toUpperCase()
+                                )}
                             </div>
                         </div>
                     </div>

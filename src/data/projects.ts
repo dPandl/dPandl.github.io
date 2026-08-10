@@ -276,7 +276,7 @@ async function enrichWithGitHubReleases(projectsList: Project[]): Promise<Projec
                                 autoDownloadUrls.android = url;
                             } else if (name.includes('.dmg') || name.includes('-mac') || name.includes('.pkg')) {
                                 autoDownloadUrls.mac = url;
-                            } else if (name.includes('.appimage') || name.includes('.deb') || name.includes('-linux') || name.includes('.rpm')) {
+                            } else if (name.includes('.appimage') || name.includes('.deb') || name.includes('-linux') || name.includes('.rpm') || (name.includes('linux') && name.includes('.zip'))) {
                                 autoDownloadUrls.linux = url;
                             }
                         });
