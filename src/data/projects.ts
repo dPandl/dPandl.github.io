@@ -15,6 +15,12 @@ export interface Project {
     openUrl?: string;
     downloadUrl?: string;
     downloadFilename?: string;
+    downloadUrls?: {
+        windows?: string;
+        linux?: string;
+        mac?: string;
+        android?: string;
+    };
     status?: string;
     category: ProjectCategory;
     version: string;
@@ -257,19 +263,37 @@ async function enrichWithGitHubReleases(projectsList: Project[]): Promise<Projec
                     
                     let downloadUrl = project.downloadUrl;
                     let downloadFilename = project.downloadFilename;
-                    
-                    // Only attach download URL if the release actually has built release assets (.exe / .zip)
+                    const autoDownloadUrls = { ...project.downloadUrls };
+
                     if (release.assets && release.assets.length > 0) {
-                        const asset = release.assets[0];
-                        downloadUrl = asset.browser_download_url;
-                        downloadFilename = asset.name;
+                        release.assets.forEach((asset: any) => {
+                            const name = (asset.name || '').toLowerCase();
+                            const url = asset.browser_download_url;
+
+                            if (name.includes('.exe') || name.includes('-win') || name.includes('.msi')) {
+                                autoDownloadUrls.windows = url;
+                            } else if (name.includes('.apk')) {
+                                autoDownloadUrls.android = url;
+                            } else if (name.includes('.dmg') || name.includes('-mac') || name.includes('.pkg')) {
+                                autoDownloadUrls.mac = url;
+                            } else if (name.includes('.appimage') || name.includes('.deb') || name.includes('-linux') || name.includes('.rpm')) {
+                                autoDownloadUrls.linux = url;
+                            }
+                        });
+
+                        // Default fallback asset
+                        if (!downloadUrl && release.assets[0]) {
+                            downloadUrl = release.assets[0].browser_download_url;
+                            downloadFilename = release.assets[0].name;
+                        }
                     }
 
                     return {
                         ...project,
                         version: version || project.version,
                         downloadUrl: downloadUrl,
-                        downloadFilename: downloadFilename
+                        downloadFilename: downloadFilename,
+                        downloadUrls: autoDownloadUrls
                     };
                 }
             } catch (e) {

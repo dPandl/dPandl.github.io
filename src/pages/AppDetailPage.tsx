@@ -154,20 +154,45 @@ const AppDetailPage: React.FC<AppDetailPageProps> = ({ app, onBack, isAdmin, onE
                             </a>
                         )}
 
-                        {app.downloadUrl && (
-                            <a
-                                href={app.downloadUrl}
-                                download={app.downloadFilename || true}
-                                className="px-8 py-3.5 bg-gray-900 hover:bg-black dark:bg-gray-700 dark:hover:bg-gray-600 text-white font-bold rounded-2xl shadow-md transition-all text-center flex items-center justify-center gap-2 hover:scale-[1.02]"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                </svg>
-                                Herunterladen
-                            </a>
-                        )}
+                        {(() => {
+                            // Smart OS detection for best download link
+                            const ua = navigator.userAgent.toLowerCase();
+                            let activeDownloadUrl = app.downloadUrl;
+                            let osLabel = '';
 
-                        {!app.openUrl && !app.downloadUrl && (
+                            if (app.downloadUrls) {
+                                if (ua.includes('win') && app.downloadUrls.windows) {
+                                    activeDownloadUrl = app.downloadUrls.windows;
+                                    osLabel = ' (Windows)';
+                                } else if (ua.includes('android') && app.downloadUrls.android) {
+                                    activeDownloadUrl = app.downloadUrls.android;
+                                    osLabel = ' (Android APK)';
+                                } else if (ua.includes('mac') && app.downloadUrls.mac) {
+                                    activeDownloadUrl = app.downloadUrls.mac;
+                                    osLabel = ' (macOS)';
+                                } else if (ua.includes('linux') && app.downloadUrls.linux) {
+                                    activeDownloadUrl = app.downloadUrls.linux;
+                                    osLabel = ' (Linux)';
+                                }
+                            }
+
+                            if (!activeDownloadUrl) return null;
+
+                            return (
+                                <a
+                                    href={activeDownloadUrl}
+                                    download={app.downloadFilename || true}
+                                    className="px-8 py-3.5 bg-gray-900 hover:bg-black dark:bg-gray-700 dark:hover:bg-gray-600 text-white font-bold rounded-2xl shadow-md transition-all text-center flex items-center justify-center gap-2 hover:scale-[1.02]"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                    Herunterladen{osLabel}
+                                </a>
+                            );
+                        })()}
+
+                        {!app.openUrl && !app.downloadUrl && (!app.downloadUrls || !Object.values(app.downloadUrls).some(Boolean)) && (
                             <span className="px-6 py-3 bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 rounded-2xl text-sm font-semibold text-center">
                                 Bald verfügbar
                             </span>

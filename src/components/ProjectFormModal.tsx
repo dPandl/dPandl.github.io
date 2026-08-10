@@ -345,30 +345,85 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
                 </div>
 
                 {/* Download URLs */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
-                            Download URL (Herunterladen-Button)
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="https://github.com/.../release.exe"
-                            value={formData.downloadUrl}
-                            onChange={(e) => handleChange('downloadUrl', e.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-sm"
-                        />
+                <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-200 dark:border-gray-700 space-y-4">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                        Manuelle Download Links (Optional pro Betriebssystem)
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label className="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
+                                🪟 Windows (.exe / .zip)
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="https://..."
+                                value={formData.downloadUrls?.windows || ''}
+                                onChange={(e) => handleChange('downloadUrls', { ...formData.downloadUrls, windows: e.target.value })}
+                                className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-xs"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
+                                🤖 Android (.apk)
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="https://..."
+                                value={formData.downloadUrls?.android || ''}
+                                onChange={(e) => handleChange('downloadUrls', { ...formData.downloadUrls, android: e.target.value })}
+                                className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-xs"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
+                                🍏 macOS (.dmg / .zip)
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="https://..."
+                                value={formData.downloadUrls?.mac || ''}
+                                onChange={(e) => handleChange('downloadUrls', { ...formData.downloadUrls, mac: e.target.value })}
+                                className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-xs"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
+                                🐧 Linux (.AppImage / .deb)
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="https://..."
+                                value={formData.downloadUrls?.linux || ''}
+                                onChange={(e) => handleChange('downloadUrls', { ...formData.downloadUrls, linux: e.target.value })}
+                                className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-xs"
+                            />
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
-                            Download Dateiname
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="PartyGames-Setup.exe"
-                            value={formData.downloadFilename}
-                            onChange={(e) => handleChange('downloadFilename', e.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-sm"
-                        />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+                        <div>
+                            <label className="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
+                                Standard/Fallback Download URL
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="https://..."
+                                value={formData.downloadUrl || ''}
+                                onChange={(e) => handleChange('downloadUrl', e.target.value)}
+                                className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-xs"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
+                                Download Dateiname
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="App-Setup.exe"
+                                value={formData.downloadFilename || ''}
+                                onChange={(e) => handleChange('downloadFilename', e.target.value)}
+                                className="w-full px-3.5 py-2 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-xs"
+                            />
+                        </div>
                     </div>
                 </div>
 
