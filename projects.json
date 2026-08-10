@@ -7,7 +7,7 @@
     "longDescription": "Party Games bringt Schwung in jede Feier! Mit einer vielfältigen Auswahl an Kategorien, Minispielen und interaktiven Aufgaben ist für jeden Geschmack etwas dabei. Die App läuft direkt im Browser, ohne Download oder Installation, und eignet sich hervorragend für spontane Spieleabende.",
     "color": "#8b5cf6",
     "category": "Games",
-    "version": "2.1.0",
+    "version": "1.0.2",
     "releaseDate": "15.01.2024",
     "updatedDate": "10.05.2024",
     "supportedPlatforms": "mobile",
@@ -57,7 +57,8 @@
     ],
     "screenshots": [
       "https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1000&q=80"
-    ]
+    ],
+    "isFeatured": false
   },
   {
     "id": "ausbildungsplaner",
@@ -86,7 +87,8 @@
     "screenshots": [
       "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1000&q=80",
       "https://images.unsplash.com/photo-1501504905252-473c47e087f8?auto=format&fit=crop&w=1000&q=80"
-    ]
+    ],
+    "isFeatured": false
   },
   {
     "id": "zeiterfassung",
@@ -114,7 +116,8 @@
     ],
     "screenshots": [
       "https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?auto=format&fit=crop&w=1000&q=80"
-    ]
+    ],
+    "isFeatured": false
   },
   {
     "id": "kindergarten-dienstplan",
@@ -142,7 +145,8 @@
     ],
     "screenshots": [
       "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1000&q=80"
-    ]
+    ],
+    "isFeatured": false
   },
   {
     "id": "kindergarten-essensplaner",
@@ -170,7 +174,8 @@
     ],
     "screenshots": [
       "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1000&q=80"
-    ]
+    ],
+    "isFeatured": false
   },
   {
     "id": "kitalytics",
@@ -198,7 +203,8 @@
     ],
     "screenshots": [
       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&q=80"
-    ]
+    ],
+    "isFeatured": false
   },
   {
     "id": "erzieher-app",
@@ -224,7 +230,8 @@
       "Druck- und PDF-Export für Elterngeschpräche",
       "Offline-First Architektur"
     ],
-    "screenshots": []
+    "screenshots": [],
+    "isFeatured": false
   },
   {
     "id": "webapp-sandbox",
@@ -249,6 +256,7 @@
       "Zugriff auf moderne Browser APIs",
       "Performance Benchmark-Tools"
     ],
-    "screenshots": []
+    "screenshots": [],
+    "isFeatured": false
   }
 ]
