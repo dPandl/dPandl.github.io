@@ -473,6 +473,16 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
                     </ul>
                 </div>
 
+                {/* GitHub Deployment Info Hint */}
+                <div className="p-3.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-xs text-cyan-700 dark:text-cyan-300 flex items-center gap-2.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-cyan-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>
+                        <strong>Hinweis:</strong> Nach dem Speichern wird die Änderung sofort auf GitHub committet. Es kann ca. 1–2 Minuten dauern, bis GitHub Pages die Live-Seite weltweit aktualisiert.
+                    </span>
+                </div>
+
                 {/* Submit Actions */}
                 <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
                     <button

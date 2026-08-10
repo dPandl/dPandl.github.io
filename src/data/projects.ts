@@ -243,9 +243,11 @@ export const initialProjects: Project[] = [
 ];
 
 export async function fetchProjects(): Promise<Project[]> {
+    const timestamp = Date.now();
+    
+    // 1. Try local relative fetch with cache-busting
     try {
-        // Option 1: Live fetch via relative URL or GitHub raw JSON
-        const response = await fetch('./projects.json?t=' + Date.now());
+        const response = await fetch(`./projects.json?t=${timestamp}`);
         if (response.ok) {
             const data = await response.json();
             if (Array.isArray(data) && data.length > 0) {
@@ -253,8 +255,23 @@ export async function fetchProjects(): Promise<Project[]> {
             }
         }
     } catch (e) {
-        console.warn('Live fetch via projects.json failed, falling back to static data:', e);
+        console.warn('Local projects.json fetch failed:', e);
     }
+
+    // 2. Fallback to raw GitHub main branch for instant real-time sync
+    try {
+        const rawUrl = `https://raw.githubusercontent.com/dPandl/dPandl.github.io/main/projects.json?t=${timestamp}`;
+        const rawResponse = await fetch(rawUrl);
+        if (rawResponse.ok) {
+            const rawData = await rawResponse.json();
+            if (Array.isArray(rawData) && rawData.length > 0) {
+                return rawData;
+            }
+        }
+    } catch (e) {
+        console.warn('Raw GitHub fetch failed:', e);
+    }
+
     return initialProjects;
 }
 

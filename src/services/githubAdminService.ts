@@ -1,8 +1,8 @@
-// Helper for GitHub REST API interaction to commit public/projects.json directly
+// Helper for GitHub REST API interaction to commit projects.json directly
 
 const REPO_OWNER = 'dPandl';
 const REPO_NAME = 'dPandl.github.io';
-const FILE_PATH = 'public/projects.json';
+const FILE_PATH = 'projects.json';
 
 export function getAdminToken(): string | null {
     return localStorage.getItem('by_dp_github_token');
@@ -30,16 +30,23 @@ interface FetchFileResult {
 export async function getFileFromGitHub(token: string): Promise<FetchFileResult> {
     // Add timestamp param to avoid browser caching without CORS preflight issues
     const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}?t=${Date.now()}`;
+    
+    // Support modern Bearer token or token prefix
+    const authHeader = token.startsWith('ghp_') || token.startsWith('github_pat_') ? `Bearer ${token}` : `token ${token}`;
+
     const response = await fetch(url, {
         headers: {
-            'Authorization': `token ${token}`,
+            'Authorization': authHeader,
             'Accept': 'application/vnd.github.v3+json'
         }
     });
 
     if (!response.ok) {
         if (response.status === 401 || response.status === 403) {
-            throw new Error('Ungültiger GitHub Access Token oder fehlende Rechte.');
+            throw new Error('Ungültiger GitHub Access Token oder fehlende Lese-/Schreibrechte.');
+        }
+        if (response.status === 404) {
+            throw new Error(`Die Datei '${FILE_PATH}' wurde auf dem Repository '${REPO_OWNER}/${REPO_NAME}' nicht gefunden.`);
         }
         throw new Error(`GitHub API Fehler (${response.status}): ${response.statusText}`);
     }
@@ -72,27 +79,54 @@ export async function commitProjectsToGitHub(projectsData: any[], commitMessage:
         binary += String.fromCharCode(bytes[i]);
     }
     const base64Content = btoa(binary);
-
-    // 4. Put request to commit file
+    const authHeader = token.startsWith('ghp_') || token.startsWith('github_pat_') ? `Bearer ${token}` : `token ${token}`;
     const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
-    const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-            'Authorization': `token ${token}`,
-            'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            message: commitMessage || 'Update projects.json via Web Admin',
-            content: base64Content,
-            sha: sha,
-            branch: 'main'
-        })
-    });
 
-    if (!response.ok) {
-        const errJson = await response.json().catch(() => ({}));
-        throw new Error(errJson.message || `Commit fehlgeschlagen (${response.status})`);
+    // Helper function to commit to a specific branch
+    const commitToBranch = async (branchName: string) => {
+        let branchSha = sha;
+        // Fetch specific SHA for branch if different
+        try {
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}?ref=${branchName}`, {
+                headers: { 'Authorization': authHeader, 'Accept': 'application/vnd.github.v3+json' }
+            });
+            if (res.ok) {
+                const bData = await res.json();
+                branchSha = bData.sha;
+            }
+        } catch (e) {
+            // fallback to initial sha
+        }
+
+        return await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Authorization': authHeader,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: commitMessage || 'Update projects.json via Web Admin',
+                content: base64Content,
+                sha: branchSha,
+                branch: branchName
+            })
+        });
+    };
+
+    // 1. Commit to main branch (source repository)
+    const responseMain = await commitToBranch('main');
+
+    // 2. Also commit directly to gh-pages branch so live website updates immediately without rebuild
+    try {
+        await commitToBranch('gh-pages');
+    } catch (e) {
+        console.warn('Could not update gh-pages branch directly:', e);
+    }
+
+    if (!responseMain.ok) {
+        const errJson = await responseMain.json().catch(() => ({}));
+        throw new Error(errJson.message || `Commit fehlgeschlagen (${responseMain.status})`);
     }
 
     return true;
