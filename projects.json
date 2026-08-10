@@ -234,11 +234,12 @@
     "longDescription": "Die Erzieher App unterstützt pädagogisches Fachpersonal bei der täglichen Entwicklungsdokumentation, Portfolioarbeit und Angebotsplanung. Sparen Sie wertvolle Zeit bei Verwaltungsaufgaben.",
     "color": "#3b82f6",
     "category": "Kindergarten",
-    "version": "0.9.0 (Beta)",
-    "releaseDate": "Demnächst",
-    "updatedDate": "08.08.2024",
+    "version": "0.1.1.1",
+    "releaseDate": "03.09.2025",
+    "updatedDate": "23.10.2025",
     "supportedPlatforms": "both",
     "developer": "by-dp",
+    "isFeatured": false,
     "icon": "",
     "openUrl": "https://by-dp.de/erzieher-app/",
     "downloadUrl": "",
@@ -250,8 +251,7 @@
       "Druck- und PDF-Export für Elterngeschpräche",
       "Offline-First Architektur"
     ],
-    "screenshots": [],
-    "isFeatured": false
+    "screenshots": []
   },
   {
     "id": "webapp-sandbox",
