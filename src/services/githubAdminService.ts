@@ -79,54 +79,28 @@ export async function commitProjectsToGitHub(projectsData: any[], commitMessage:
         binary += String.fromCharCode(bytes[i]);
     }
     const base64Content = btoa(binary);
+    // Put request to commit updated projects.json file
     const authHeader = token.startsWith('ghp_') || token.startsWith('github_pat_') ? `Bearer ${token}` : `token ${token}`;
+
     const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
+    const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Authorization': authHeader,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            message: commitMessage || 'Update projects.json via Web Admin',
+            content: base64Content,
+            sha: sha,
+            branch: 'main'
+        })
+    });
 
-    // Helper function to commit to a specific branch
-    const commitToBranch = async (branchName: string) => {
-        let branchSha = sha;
-        // Fetch specific SHA for branch if different
-        try {
-            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}?ref=${branchName}`, {
-                headers: { 'Authorization': authHeader, 'Accept': 'application/vnd.github.v3+json' }
-            });
-            if (res.ok) {
-                const bData = await res.json();
-                branchSha = bData.sha;
-            }
-        } catch (e) {
-            // fallback to initial sha
-        }
-
-        return await fetch(url, {
-            method: 'PUT',
-            headers: {
-                'Authorization': authHeader,
-                'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                message: commitMessage || 'Update projects.json via Web Admin',
-                content: base64Content,
-                sha: branchSha,
-                branch: branchName
-            })
-        });
-    };
-
-    // 1. Commit to main branch (source repository)
-    const responseMain = await commitToBranch('main');
-
-    // 2. Also commit directly to gh-pages branch so live website updates immediately without rebuild
-    try {
-        await commitToBranch('gh-pages');
-    } catch (e) {
-        console.warn('Could not update gh-pages branch directly:', e);
-    }
-
-    if (!responseMain.ok) {
-        const errJson = await responseMain.json().catch(() => ({}));
-        throw new Error(errJson.message || `Commit fehlgeschlagen (${responseMain.status})`);
+    if (!response.ok) {
+        const errJson = await response.json().catch(() => ({}));
+        throw new Error(errJson.message || `Commit fehlgeschlagen (${response.status})`);
     }
 
     return true;
