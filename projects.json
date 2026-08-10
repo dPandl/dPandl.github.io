@@ -200,31 +200,26 @@
   {
     "id": "kitalytics",
     "title": "Kitalytics",
-    "tagline": "Anwesenheiten erfassen & Auslastung optimal analysieren.",
+    "tagline": "Datenvisualisierung für Kindergärten. Einfach, sicher und aufschlussreich.",
     "description": "Erfassen Sie Anwesenheiten, analysieren Sie die Auslastung und optimieren Sie Ihre Planung.",
-    "longDescription": "Kitalytics bringt datengestützte Einblicke in den Kita-Alltag. Erfassen Sie Anwesenheitszeiten, Betreuungsschlüssel und Auslastungen, um Personalressourcen vorausschauend und bedarfsgerecht zu planen.",
+    "longDescription": "Erfassen Sie Anwesenheiten, analysieren Sie die Auslastung und optimieren Sie Ihre Planung – alles datenschutzkonform und lokal auf Ihrem Gerät.",
     "color": "#0d9488",
     "category": "Kindergarten",
-    "version": "1.1.0",
-    "releaseDate": "01.06.2024",
-    "updatedDate": "02.08.2024",
+    "version": "1.0.1",
+    "releaseDate": "29.08.2025",
+    "updatedDate": "06.02.2026",
     "supportedPlatforms": "desktop",
     "developer": "by-dp",
+    "isFeatured": false,
     "icon": "",
     "openUrl": "https://by-dp.de/Kitalytics/",
     "downloadUrl": "",
     "downloadFilename": "",
     "status": "",
     "features": [
-      "Echtzeit-Statistiken zur Kita-Auslastung",
-      "Betreuungsschlüssel-Rechner",
-      "Graphische Auswertungen & Berichte",
       "Lokale Datenspeicherung auf dem Einrichtungsgerät"
     ],
-    "screenshots": [
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "isFeatured": false
+    "screenshots": []
   },
   {
     "id": "erzieher-app",
