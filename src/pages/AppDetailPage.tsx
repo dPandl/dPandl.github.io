@@ -155,39 +155,76 @@ const AppDetailPage: React.FC<AppDetailPageProps> = ({ app, onBack, isAdmin, onE
                         )}
 
                         {(() => {
-                            // Smart OS detection for best download link
+                            // Smart OS detection for best download link & icon
                             const ua = navigator.userAgent.toLowerCase();
                             let activeDownloadUrl = app.downloadUrl;
-                            let osLabel = '';
+                            let osName = 'Desktop';
 
                             if (app.downloadUrls) {
                                 if (ua.includes('win') && app.downloadUrls.windows) {
                                     activeDownloadUrl = app.downloadUrls.windows;
-                                    osLabel = ' (Windows)';
+                                    osName = 'windows';
                                 } else if (ua.includes('android') && app.downloadUrls.android) {
                                     activeDownloadUrl = app.downloadUrls.android;
-                                    osLabel = ' (Android APK)';
+                                    osName = 'android';
                                 } else if (ua.includes('mac') && app.downloadUrls.mac) {
                                     activeDownloadUrl = app.downloadUrls.mac;
-                                    osLabel = ' (macOS)';
+                                    osName = 'mac';
                                 } else if (ua.includes('linux') && app.downloadUrls.linux) {
                                     activeDownloadUrl = app.downloadUrls.linux;
-                                    osLabel = ' (Linux)';
+                                    osName = 'linux';
                                 }
                             }
 
                             if (!activeDownloadUrl) return null;
 
+                            // OS Icons
+                            const renderOsIcon = () => {
+                                switch (osName) {
+                                    case 'windows':
+                                        return (
+                                            <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
+                                                <path d="M0 3.449L9.75 2.1v9.451H0m10.95-9.6L24 0v11.4H10.95M0 12.6h9.75v9.451L0 20.699M10.95 12.6H24V24l-13.05-1.8" />
+                                            </svg>
+                                        );
+                                    case 'android':
+                                        return (
+                                            <svg className="h-4.5 w-4.5 fill-current" viewBox="0 0 24 24">
+                                                <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993s-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993s-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1522-.5676.416.416 0 00-.5676.1522l-2.0223 3.5028C15.5902 8.3585 13.8531 8 12 8s-3.5902.3585-5.1367.9501L4.841 5.4473a.416.416 0 00-.5676-.1522.416.416 0 00-.1522.5676l1.9973 3.4592C2.6889 11.0867.348 14.3415.0042 18.27h23.9916c-.3438-3.9285-2.6847-7.1833-6.1143-8.9486" />
+                                            </svg>
+                                        );
+                                    case 'mac':
+                                        return (
+                                            <svg className="h-4.5 w-4.5 fill-current" viewBox="0 0 24 24">
+                                                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.32c.67-.82 1.12-1.95.99-3.08-1 .04-2.16.67-2.86 1.48-.62.72-1.16 1.87-1.01 2.99 1.11.09 2.22-.57 2.88-1.39z" />
+                                            </svg>
+                                        );
+                                    case 'linux':
+                                        return (
+                                            <svg className="h-4.5 w-4.5 fill-current" viewBox="0 0 24 24">
+                                                <path d="M12.002 0c-2.82 0-5.109 2.289-5.109 5.11 0 1.258.46 2.408 1.22 3.303a11.233 11.233 0 00-4.088 8.653c0 .248.016.492.046.732a3.864 3.864 0 00-1.783 3.256c0 1.625 1.002 2.946 2.238 2.946.99 0 1.833-.846 2.14-2.025a15.82 15.82 0 005.336.925c1.88 0 3.666-.328 5.336-.925.307 1.179 1.15 2.025 2.14 2.025 1.236 0 2.238-1.321 2.238-2.946 0-1.428-.775-2.64-1.783-3.256.03-.24.046-.484.046-.732a11.233 11.233 0 00-4.088-8.653c.76-.895 1.22-2.045 1.22-3.303C17.11 2.289 14.822 0 12.002 0z" />
+                                            </svg>
+                                        );
+                                    default:
+                                        return null;
+                                }
+                            };
+
                             return (
                                 <a
                                     href={activeDownloadUrl}
                                     download={app.downloadFilename || true}
-                                    className="px-8 py-3.5 bg-gray-900 hover:bg-black dark:bg-gray-700 dark:hover:bg-gray-600 text-white font-bold rounded-2xl shadow-md transition-all text-center flex items-center justify-center gap-2 hover:scale-[1.02]"
+                                    className="px-8 py-3.5 bg-gray-900 hover:bg-black dark:bg-gray-700/90 dark:hover:bg-gray-600 text-white font-bold rounded-2xl shadow-lg shadow-gray-900/20 transition-all text-center flex items-center justify-center gap-2.5 hover:scale-[1.02] border border-gray-700/50"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                     </svg>
-                                    Herunterladen{osLabel}
+                                    <span>Herunterladen</span>
+                                    {renderOsIcon() && (
+                                        <span className="ml-0.5 p-1 rounded-md bg-white/10 flex items-center justify-center text-gray-200">
+                                            {renderOsIcon()}
+                                        </span>
+                                    )}
                                 </a>
                             );
                         })()}

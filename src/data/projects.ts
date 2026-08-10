@@ -255,8 +255,16 @@ async function enrichWithGitHubReleases(projectsList: Project[]): Promise<Projec
         projectsList.map(async (project) => {
             if (!project.githubRepo) return project;
             try {
+                // Clean input: remove https://github.com/ and trailing slashes
+                const cleanRepo = project.githubRepo
+                    .replace(/^https?:\/\/github\.com\//i, '')
+                    .trim()
+                    .replace(/\/+$/, '');
+
+                if (!cleanRepo) return project;
+
                 // Fetch latest release from GitHub API (public API, no auth required)
-                const res = await fetch(`https://api.github.com/repos/${project.githubRepo}/releases/latest`);
+                const res = await fetch(`https://api.github.com/repos/${cleanRepo}/releases/latest`);
                 if (res.ok) {
                     const release = await res.json();
                     const version = release.tag_name ? release.tag_name.replace(/^v/, '') : project.version;
