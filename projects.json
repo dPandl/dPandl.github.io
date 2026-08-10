@@ -121,15 +121,14 @@
     "title": "Zeiterfassung",
     "tagline": "Arbeitszeiten erfassen, auswerten & als PDF exportieren.",
     "description": "Eine App die hilft, Arbeitsstunden nach Projekten zu erfassen, Berichte einzusehen und diese als PDF zu exportieren.",
-    "longDescription": "Zeiterfassung ohne Cloud-Zwang. Erfasse Stempelzeiten oder projektspezifische Stunden direkt im Browser. Generiere mit einem Klick übersichtliche Monatsberichte und exportiere diese als druckfertiges PDF.",
+    "longDescription": "Professionelle Zeiterfassung ohne Cloud-Zwang. Erfasse Stempelzeiten oder projektspezifische Stunden direkt im Browser. Generiere mit einem Klick übersichtliche Monatsberichte und exportiere diese als druckfertiges PDF.",
     "color": "#14b8a6",
     "category": "Alltagshelfer",
-    "version": "1.0.0",
-    "releaseDate": "13.08.2025",
-    "updatedDate": "17.08.2025",
+    "version": "1.8.0",
+    "releaseDate": "20.11.2023",
+    "updatedDate": "05.08.2024",
     "supportedPlatforms": "both",
     "developer": "by-dp",
-    "isFeatured": false,
     "icon": "",
     "openUrl": "https://by-dp.de/Zeiterfassung/",
     "downloadUrl": "",
@@ -138,9 +137,13 @@
     "features": [
       "Projekt- & Kundenbezogene Stundenerfassung",
       "Automatische Pausenberechnung",
-      "PDF- & CSV-Export für die Buchhaltung"
+      "PDF- & CSV-Export für die Buchhaltung",
+      "Offline nutzbar (Progressive Web App)"
     ],
-    "screenshots": []
+    "screenshots": [
+      "https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?auto=format&fit=crop&w=1000&q=80"
+    ],
+    "isFeatured": false
   },
   {
     "id": "kindergarten-dienstplan",
@@ -151,25 +154,23 @@
     "color": "#ec4899",
     "category": "Kindergarten",
     "version": "2.0.4",
-    "releaseDate": "05.02.2024",
-    "updatedDate": "01.08.2024",
+    "releaseDate": "30.05.2025",
+    "updatedDate": "22.07.2025",
     "supportedPlatforms": "desktop",
     "developer": "by-dp",
+    "isFeatured": false,
     "icon": "",
     "openUrl": "https://by-dp.de/kindergarten-dienstplan-app/",
     "downloadUrl": "",
     "downloadFilename": "",
     "status": "",
     "features": [
-      "Vorlagen für Früh-, Mittel- und Spätschichten",
-      "Urlaubs- & Krankheitsverwaltung",
-      "Export als Wochen- & Monatsübersicht",
-      "DSGVO-konform ohne Cloud-Speicherung"
+      "Speziell für Kindergärten",
+      "Automatische Warnungen",
+      "Frei Anpassbar",
+      "Gesamtplan oder nach Gruppen oder Mitarbeitern drucken"
     ],
-    "screenshots": [
-      "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "isFeatured": false
+    "screenshots": []
   },
   {
     "id": "kindergarten-essensplaner",
