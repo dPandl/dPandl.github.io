@@ -28,12 +28,12 @@ interface FetchFileResult {
 
 // Fetch file SHA & content from GitHub API
 export async function getFileFromGitHub(token: string): Promise<FetchFileResult> {
-    const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`;
+    // Add timestamp param to avoid browser caching without CORS preflight issues
+    const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}?t=${Date.now()}`;
     const response = await fetch(url, {
         headers: {
             'Authorization': `token ${token}`,
-            'Accept': 'application/vnd.github.v3+json',
-            'Cache-Control': 'no-cache'
+            'Accept': 'application/vnd.github.v3+json'
         }
     });
 
