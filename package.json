@@ -9,7 +9,7 @@
     "build": "vite build",
     "lint": "tsc",
     "preview": "vite preview",
-    "predeploy": "node scripts/sync-projects.js && npm run build",
+    "predeploy": "node scripts/syncProjects.js && npm run build",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
