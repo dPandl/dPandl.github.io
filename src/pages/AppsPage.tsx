@@ -4,9 +4,11 @@ import { projects as fallbackProjects, fetchProjects, Project } from '../data/pr
 
 interface AppsPageProps {
     onSelectApp?: (app: Project) => void;
+    isAdmin?: boolean;
+    onAddNewApp?: () => void;
 }
 
-const AppsPage: React.FC<AppsPageProps> = ({ onSelectApp }) => {
+const AppsPage: React.FC<AppsPageProps> = ({ onSelectApp, isAdmin, onAddNewApp }) => {
     const [projectList, setProjectList] = useState<Project[]>(fallbackProjects);
     const [searchQuery, setSearchQuery] = useState('');
     const [activeCategory, setActiveCategory] = useState<string>('Alle');
@@ -109,19 +111,33 @@ const AppsPage: React.FC<AppsPageProps> = ({ onSelectApp }) => {
 
             {/* Search and Filter Section */}
             <div className="max-w-4xl mx-auto mb-12 space-y-6">
-                <div className="relative">
-                    <input
-                        type="text"
-                        placeholder="Nach Apps, Kategorien oder Funktionen suchen..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full px-6 py-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all dark:text-white text-lg placeholder-gray-400"
-                    />
-                    <div className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
+                <div className="flex flex-col sm:flex-row gap-3 items-center">
+                    <div className="relative flex-grow w-full">
+                        <input
+                            type="text"
+                            placeholder="Nach Apps, Kategorien oder Funktionen suchen..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full px-6 py-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all dark:text-white text-lg placeholder-gray-400"
+                        />
+                        <div className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
                     </div>
+
+                    {isAdmin && (
+                        <button
+                            onClick={onAddNewApp}
+                            className="w-full sm:w-auto px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all shrink-0 flex items-center justify-center gap-2 text-base"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                            </svg>
+                            Neue App hinzufügen
+                        </button>
+                    )}
                 </div>
 
                 <div className="flex flex-wrap justify-center gap-3">

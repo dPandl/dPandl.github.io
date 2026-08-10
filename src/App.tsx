@@ -8,9 +8,13 @@ import ImpressumContent from './pages/ImpressumContent';
 import DatenschutzContent from './pages/DatenschutzContent';
 import CookieBanner from './components/CookieBanner';
 import Footer from './components/Footer';
+import AdminLoginModal from './components/AdminLoginModal';
+import ProjectFormModal from './components/ProjectFormModal';
+import ConfirmDeleteModal from './components/ConfirmDeleteModal';
 import { initialProjects, fetchProjects, Project } from './data/projects';
+import { isAdminLoggedIn, commitProjectsToGitHub } from './services/githubAdminService';
 
-type ModalType = 'impressum' | 'datenschutz' | null;
+type ModalType = 'impressum' | 'datenschutz' | 'adminLogin' | 'projectForm' | 'confirmDelete' | null;
 export type PageType = 'home' | 'apps';
 
 interface RouteState {
@@ -34,6 +38,9 @@ const App: React.FC = () => {
     const [activeModal, setActiveModal] = useState<ModalType>(null);
     const [route, setRoute] = useState<RouteState>(parseHash());
     const [projectList, setProjectList] = useState<Project[]>(initialProjects);
+    const [isAdmin, setIsAdmin] = useState<boolean>(isAdminLoggedIn());
+    const [editingProject, setEditingProject] = useState<Project | null>(null);
+    const [deletingProject, setDeletingProject] = useState<Project | null>(null);
     const savedScrollPos = React.useRef<number>(0);
 
     useEffect(() => {
@@ -75,12 +82,47 @@ const App: React.FC = () => {
     }, [route.selectedAppId]);
 
     const openModal = (modal: ModalType) => setActiveModal(modal);
-    const closeModal = () => setActiveModal(null);
+    const closeModal = () => {
+        setActiveModal(null);
+        setEditingProject(null);
+        setDeletingProject(null);
+    };
     
     const navigateTo = (targetPage: PageType) => {
         if (targetPage === 'home') {
             window.location.hash = '';
         } else {
+            window.location.hash = '#apps';
+        }
+    };
+
+    // Admin Handlers
+    const handleSaveProject = async (projectToSave: Project) => {
+        let updatedList: Project[] = [];
+        
+        // If isFeatured is set to true for projectToSave, set it to false for all other projects
+        if (projectToSave.isFeatured) {
+            projectList.forEach(p => { p.isFeatured = false; });
+        }
+
+        const existingIdx = projectList.findIndex(p => p.id === projectToSave.id);
+        if (existingIdx >= 0) {
+            updatedList = [...projectList];
+            updatedList[existingIdx] = projectToSave;
+        } else {
+            updatedList = [projectToSave, ...projectList];
+        }
+
+        await commitProjectsToGitHub(updatedList, `App updated/created: ${projectToSave.title}`);
+        setProjectList(updatedList);
+    };
+
+    const handleDeleteProject = async () => {
+        if (!deletingProject) return;
+        const updatedList = projectList.filter(p => p.id !== deletingProject.id);
+        await commitProjectsToGitHub(updatedList, `App deleted: ${deletingProject.title}`);
+        setProjectList(updatedList);
+        if (route.selectedAppId === deletingProject.id) {
             window.location.hash = '#apps';
         }
     };
@@ -100,6 +142,11 @@ const App: React.FC = () => {
                 {route.page === 'home' && <HomePage />}
                 {route.page === 'apps' && !selectedApp && (
                     <AppsPage 
+                        isAdmin={isAdmin}
+                        onAddNewApp={() => {
+                            setEditingProject(null);
+                            openModal('projectForm');
+                        }}
                         onSelectApp={(app) => {
                             window.location.hash = `#app/${app.id}`;
                         }}
@@ -108,6 +155,15 @@ const App: React.FC = () => {
                 {route.page === 'apps' && selectedApp && (
                     <AppDetailPage 
                         app={selectedApp} 
+                        isAdmin={isAdmin}
+                        onEditApp={(app) => {
+                            setEditingProject(app);
+                            openModal('projectForm');
+                        }}
+                        onDeleteApp={(app) => {
+                            setDeletingProject(app);
+                            openModal('confirmDelete');
+                        }}
                         onBack={() => {
                             window.location.hash = '#apps';
                         }}
@@ -118,14 +174,35 @@ const App: React.FC = () => {
             <Footer 
                 onImpressumClick={() => openModal('impressum')}
                 onDatenschutzClick={() => openModal('datenschutz')}
+                onAdminClick={() => openModal('adminLogin')}
+                isAdmin={isAdmin}
             />
             
+            {/* Modals */}
             <Modal isOpen={activeModal === 'impressum'} onClose={closeModal} title="Impressum">
                 <ImpressumContent />
             </Modal>
             <Modal isOpen={activeModal === 'datenschutz'} onClose={closeModal} title="Datenschutzerklärung">
                 <DatenschutzContent />
             </Modal>
+            <AdminLoginModal
+                isOpen={activeModal === 'adminLogin'}
+                onClose={closeModal}
+                onLoginSuccess={() => setIsAdmin(true)}
+                onLogout={() => setIsAdmin(false)}
+            />
+            <ProjectFormModal
+                isOpen={activeModal === 'projectForm'}
+                onClose={closeModal}
+                onSave={handleSaveProject}
+                projectToEdit={editingProject}
+            />
+            <ConfirmDeleteModal
+                isOpen={activeModal === 'confirmDelete'}
+                onClose={closeModal}
+                onConfirm={handleDeleteProject}
+                appTitle={deletingProject?.title || ''}
+            />
             <CookieBanner onDatenschutzClick={() => openModal('datenschutz')} />
         </div>
     );
