@@ -41,9 +41,6 @@ const HomePage: React.FC = () => {
             {/* Hero Section */}
             <section className="relative py-20 sm:py-28 overflow-hidden">
                 <div className="container mx-auto px-6 relative z-10 text-center">
-                    <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 uppercase tracking-widest inline-block mb-6">
-                        by-dp.de • Pascal Pander
-                    </span>
                     <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-8">
                         Projekte, Apps & <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-600">
