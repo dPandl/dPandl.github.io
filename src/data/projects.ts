@@ -11,6 +11,7 @@ export interface Project {
     color: string; // Hex Farbcode (z. B. "#8b5cf6")
     glowColor?: string; // Abwärtskompatibilität
     isFeatured?: boolean; // Kennzeichnung als App des Monats / Spotlight App
+    githubRepo?: string; // z. B. "dPandl/griddly-csv" für auto-release fetch
     openUrl?: string;
     downloadUrl?: string;
     downloadFilename?: string;
@@ -242,37 +243,78 @@ export const initialProjects: Project[] = [
     }
 ];
 
+// Helper to enrich projects with live GitHub release details if githubRepo is specified
+async function enrichWithGitHubReleases(projectsList: Project[]): Promise<Project[]> {
+    return Promise.all(
+        projectsList.map(async (project) => {
+            if (!project.githubRepo) return project;
+            try {
+                // Fetch latest release from GitHub API (public API, no auth required)
+                const res = await fetch(`https://api.github.com/repos/${project.githubRepo}/releases/latest`);
+                if (res.ok) {
+                    const release = await res.json();
+                    const version = release.tag_name ? release.tag_name.replace(/^v/, '') : project.version;
+                    
+                    // Look for asset zip/exe or fallback to zipball
+                    let downloadUrl = project.downloadUrl;
+                    let downloadFilename = project.downloadFilename;
+                    
+                    if (release.assets && release.assets.length > 0) {
+                        const asset = release.assets[0];
+                        downloadUrl = asset.browser_download_url;
+                        downloadFilename = asset.name;
+                    } else if (release.zipball_url) {
+                        downloadUrl = release.zipball_url;
+                        downloadFilename = `${project.id}-${version}.zip`;
+                    }
+
+                    return {
+                        ...project,
+                        version: version || project.version,
+                        downloadUrl: downloadUrl || project.downloadUrl,
+                        downloadFilename: downloadFilename || project.downloadFilename
+                    };
+                }
+            } catch (e) {
+                console.warn(`Could not fetch latest release for ${project.githubRepo}:`, e);
+            }
+            return project;
+        })
+    );
+}
+
 export async function fetchProjects(): Promise<Project[]> {
     const timestamp = Date.now();
-    
+    let loadedProjects: Project[] = initialProjects;
+
     // 1. Try local relative fetch with cache-busting
     try {
         const response = await fetch(`./projects.json?t=${timestamp}`);
         if (response.ok) {
             const data = await response.json();
             if (Array.isArray(data) && data.length > 0) {
-                return data;
+                loadedProjects = data;
             }
         }
     } catch (e) {
         console.warn('Local projects.json fetch failed:', e);
-    }
-
-    // 2. Fallback to raw GitHub main branch for instant real-time sync
-    try {
-        const rawUrl = `https://raw.githubusercontent.com/dPandl/dPandl.github.io/main/projects.json?t=${timestamp}`;
-        const rawResponse = await fetch(rawUrl);
-        if (rawResponse.ok) {
-            const rawData = await rawResponse.json();
-            if (Array.isArray(rawData) && rawData.length > 0) {
-                return rawData;
+        // 2. Fallback to raw GitHub main branch
+        try {
+            const rawUrl = `https://raw.githubusercontent.com/dPandl/dPandl.github.io/main/projects.json?t=${timestamp}`;
+            const rawResponse = await fetch(rawUrl);
+            if (rawResponse.ok) {
+                const rawData = await rawResponse.json();
+                if (Array.isArray(rawData) && rawData.length > 0) {
+                    loadedProjects = rawData;
+                }
             }
+        } catch (e2) {
+            console.warn('Raw GitHub fetch failed:', e2);
         }
-    } catch (e) {
-        console.warn('Raw GitHub fetch failed:', e);
     }
 
-    return initialProjects;
+    // Automatically fetch latest GitHub release version and download URL for apps with githubRepo specified
+    return await enrichWithGitHubReleases(loadedProjects);
 }
 
 export const projects = initialProjects;

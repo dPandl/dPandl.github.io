@@ -216,7 +216,7 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
                 </div>
 
                 {/* Color, Category & Platform Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
                     <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
                             Hex Farbcode
@@ -226,13 +226,13 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
                                 type="color"
                                 value={formData.color || '#8b5cf6'}
                                 onChange={(e) => handleChange('color', e.target.value)}
-                                className="w-10 h-10 rounded-xl cursor-pointer border-0 bg-transparent"
+                                className="w-10 h-10 rounded-xl cursor-pointer border-0 bg-transparent shrink-0"
                             />
                             <input
                                 type="text"
                                 value={formData.color}
                                 onChange={(e) => handleChange('color', e.target.value)}
-                                className="w-full px-3 py-2 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-sm font-mono"
+                                className="w-full px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-sm font-mono"
                             />
                         </div>
                     </div>
@@ -267,7 +267,7 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
                 </div>
 
                 {/* Versions & Links Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
                     <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
                             Version
@@ -304,11 +304,23 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
                     </div>
                 </div>
 
-                {/* URLs */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* GitHub Repository & URLs */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
                     <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
-                            Web-App URL (Öffnen-Button)
+                            GitHub Repo (Auto-Sync) 🐙
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="z. B. dPandl/griddly-csv"
+                            value={formData.githubRepo || ''}
+                            onChange={(e) => handleChange('githubRepo', e.target.value)}
+                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-sm"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
+                            Web-App URL (Öffnen)
                         </label>
                         <input
                             type="text"
@@ -320,7 +332,7 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
                     </div>
                     <div>
                         <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
-                            Status (z. B. In Entwicklung)
+                            Status (z. B. Beta)
                         </label>
                         <input
                             type="text"
