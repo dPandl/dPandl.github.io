@@ -10,7 +10,7 @@ interface HeaderProps {
 
 const navItems: { page: PageType; label: string }[] = [
     { page: 'home', label: 'Startseite' },
-    { page: 'apps', label: 'Apps' },
+    { page: 'apps', label: 'App Hub' },
 ];
 
 const Header: React.FC<HeaderProps> = ({ onNavigate, activePage }) => {
