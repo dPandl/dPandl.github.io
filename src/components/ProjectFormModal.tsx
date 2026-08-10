@@ -189,18 +189,7 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
                     />
                 </div>
 
-                <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">
-                        Kurzbeschreibung
-                    </label>
-                    <textarea
-                        rows={2}
-                        placeholder="Kurzer Beschreibungstext..."
-                        value={formData.description}
-                        onChange={(e) => handleChange('description', e.target.value)}
-                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white text-sm"
-                    />
-                </div>
+
 
                 <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">

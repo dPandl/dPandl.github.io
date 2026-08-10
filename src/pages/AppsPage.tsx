@@ -44,8 +44,8 @@ const AppsPage: React.FC<AppsPageProps> = ({ onSelectApp, isAdmin, onAddNewApp }
     const filteredProjects = useMemo(() => {
         return projectList.filter(project => {
             const matchesSearch = project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                 project.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                                 project.tagline.toLowerCase().includes(searchQuery.toLowerCase());
+                                 (project.longDescription && project.longDescription.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                                 (project.tagline && project.tagline.toLowerCase().includes(searchQuery.toLowerCase()));
             const matchesCategory = activeCategory === 'Alle' || project.category === activeCategory;
             return matchesSearch && matchesCategory;
         });
