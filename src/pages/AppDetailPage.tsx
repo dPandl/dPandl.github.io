@@ -143,8 +143,6 @@ const AppDetailPage: React.FC<AppDetailPageProps> = ({ app, onBack, isAdmin, onE
                         {app.openUrl && (
                             <a
                                 href={app.openUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
                                 className="px-8 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-cyan-500/25 transition-all text-center flex items-center justify-center gap-2 hover:scale-[1.02]"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
