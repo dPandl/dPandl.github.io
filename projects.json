@@ -174,7 +174,7 @@
     "tagline": "Rückmeldungen in übersichtliche Caterer-Listen verwandeln.",
     "description": "Als Companion-App für „Stay Informed“ wandelt der Essensplaner die Rückmeldungen aus der Kindergarten-App direkt in übersichtliche Pläne und Listen um.",
     "longDescription": "Der Essensplaner vereinfacht die tägliche Essensbestellung in Kindertagesstätten, welche die Stay Informed Plattform nutzen um Eltern das Essen bestellen zu lassen. Es können CSV Dateien aus der Stay Informed App importiert werden und daten direkt kopiert werden um sie an den Caterer zu senden. außerdem können Essenslisten direkt ausgedruckt werden und Statistiken zu beliebtem Essen eingesehen werden.\n\n\nDiese App steht in keiner offiziellen Verbindung zu Stay Informed und wird von diesen nicht unterstützt.",
-    "color": "#84cc16",
+    "color": "#7ebefa",
     "category": "Kindergarten",
     "version": "0.0.0",
     "releaseDate": "21.08.2025",
