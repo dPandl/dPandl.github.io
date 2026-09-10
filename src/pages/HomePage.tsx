@@ -81,13 +81,33 @@ const HomePage: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {recentlyUpdatedProjects.map((project) => (
-                            <AppCard
-                                key={project.id}
-                                app={project}
-                                onClick={() => handleSelectApp(project.id)}
-                            />
-                        ))}
+                        {recentlyUpdatedProjects.length === 0 ? (
+                            [1, 2, 3].map((i) => (
+                                <div key={i} className="bg-white dark:bg-gray-800/90 rounded-3xl p-6 border border-gray-200/80 dark:border-gray-700/80 shadow-lg animate-pulse h-64 flex flex-col justify-between">
+                                    <div>
+                                        <div className="flex items-start justify-between gap-4 mb-4">
+                                            <div className="w-16 h-16 rounded-2xl bg-gray-200 dark:bg-gray-700" />
+                                            <div className="w-20 h-6 rounded-full bg-gray-200 dark:bg-gray-700" />
+                                        </div>
+                                        <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded-lg mb-2" />
+                                        <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded-lg mb-2" />
+                                        <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+                                    </div>
+                                    <div className="flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-700/50">
+                                        <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+                                        <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            recentlyUpdatedProjects.map((project) => (
+                                <AppCard
+                                    key={project.id}
+                                    app={project}
+                                    onClick={() => handleSelectApp(project.id)}
+                                />
+                            ))
+                        )}
                     </div>
                 </div>
             </section>

@@ -11,7 +11,7 @@ import Footer from './components/Footer';
 import AdminLoginModal from './components/AdminLoginModal';
 import ProjectFormModal from './components/ProjectFormModal';
 import ConfirmDeleteModal from './components/ConfirmDeleteModal';
-import { initialProjects, fetchProjects, Project } from './data/projects';
+import { initialProjects, fetchProjects, invalidateProjectsCache, Project } from './data/projects';
 import { isAdminLoggedIn, commitProjectsToGitHub } from './services/githubAdminService';
 
 type ModalType = 'impressum' | 'datenschutz' | 'adminLogin' | 'projectForm' | 'confirmDelete' | null;
@@ -38,6 +38,7 @@ const App: React.FC = () => {
     const [activeModal, setActiveModal] = useState<ModalType>(null);
     const [route, setRoute] = useState<RouteState>(parseHash());
     const [projectList, setProjectList] = useState<Project[]>(initialProjects);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isAdmin, setIsAdmin] = useState<boolean>(isAdminLoggedIn());
     const [editingProject, setEditingProject] = useState<Project | null>(null);
     const [deletingProject, setDeletingProject] = useState<Project | null>(null);
@@ -45,8 +46,14 @@ const App: React.FC = () => {
 
     useEffect(() => {
         let isMounted = true;
+        setIsLoading(true);
         fetchProjects().then(data => {
-            if (isMounted) setProjectList(data);
+            if (isMounted) {
+                setProjectList(data);
+                setIsLoading(false);
+            }
+        }).catch(() => {
+            if (isMounted) setIsLoading(false);
         });
         return () => { isMounted = false; };
     }, []);
@@ -114,7 +121,8 @@ const App: React.FC = () => {
         }
 
         await commitProjectsToGitHub(updatedList, `App updated/created: ${projectToSave.title}`);
-        const freshList = await fetchProjects();
+        invalidateProjectsCache();
+        const freshList = await fetchProjects(true);
         setProjectList(freshList.length > 0 ? freshList : updatedList);
     };
 
@@ -122,7 +130,8 @@ const App: React.FC = () => {
         if (!deletingProject) return;
         const updatedList = projectList.filter(p => p.id !== deletingProject.id);
         await commitProjectsToGitHub(updatedList, `App deleted: ${deletingProject.title}`);
-        const freshList = await fetchProjects();
+        invalidateProjectsCache();
+        const freshList = await fetchProjects(true);
         setProjectList(freshList.length > 0 ? freshList : updatedList);
         if (route.selectedAppId === deletingProject.id) {
             window.location.hash = '#apps';
@@ -130,7 +139,8 @@ const App: React.FC = () => {
     };
 
     const handleReloadProjects = async () => {
-        const data = await fetchProjects();
+        invalidateProjectsCache();
+        const data = await fetchProjects(true);
         setProjectList(data);
     };
 
@@ -149,6 +159,8 @@ const App: React.FC = () => {
                 {route.page === 'home' && <HomePage />}
                 {route.page === 'apps' && !selectedApp && (
                     <AppsPage 
+                        projects={projectList}
+                        isLoading={isLoading}
                         isAdmin={isAdmin}
                         onAddNewApp={() => {
                             setEditingProject(null);

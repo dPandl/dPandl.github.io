@@ -1,34 +1,67 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import AppCard from '../components/AppCard';
-import { projects as fallbackProjects, fetchProjects, Project } from '../data/projects';
+import { fetchProjects, Project } from '../data/projects';
 
 interface AppsPageProps {
+    projects?: Project[];
+    isLoading?: boolean;
     onSelectApp?: (app: Project) => void;
     isAdmin?: boolean;
     onAddNewApp?: () => void;
     onReloadProjects?: () => Promise<void> | void;
 }
 
-const AppsPage: React.FC<AppsPageProps> = ({ onSelectApp, isAdmin, onAddNewApp, onReloadProjects }) => {
-    const [projectList, setProjectList] = useState<Project[]>(fallbackProjects);
+const AppsPage: React.FC<AppsPageProps> = ({ 
+    projects: propProjects, 
+    isLoading: propIsLoading, 
+    onSelectApp, 
+    isAdmin, 
+    onAddNewApp, 
+    onReloadProjects 
+}) => {
+    const [projectList, setProjectList] = useState<Project[]>(propProjects || []);
+    const [isLoading, setIsLoading] = useState<boolean>(propIsLoading ?? (propProjects ? propProjects.length === 0 : true));
     const [searchQuery, setSearchQuery] = useState('');
     const [activeCategory, setActiveCategory] = useState<string>('Alle');
     const [isReloading, setIsReloading] = useState(false);
 
+    // Sync state whenever parent passes new projects
     useEffect(() => {
-        let isMounted = true;
-        fetchProjects().then(data => {
-            if (isMounted) setProjectList(data);
-        });
-        return () => { isMounted = false; };
-    }, []);
+        if (propProjects && propProjects.length > 0) {
+            setProjectList(propProjects);
+            setIsLoading(false);
+        }
+    }, [propProjects]);
+
+    useEffect(() => {
+        if (propIsLoading !== undefined) {
+            setIsLoading(propIsLoading);
+        }
+    }, [propIsLoading]);
+
+    // Fallback self-fetch if opened in isolation without props
+    useEffect(() => {
+        if (!propProjects || propProjects.length === 0) {
+            let isMounted = true;
+            setIsLoading(true);
+            fetchProjects().then(data => {
+                if (isMounted) {
+                    setProjectList(data);
+                    setIsLoading(false);
+                }
+            }).catch(() => {
+                if (isMounted) setIsLoading(false);
+            });
+            return () => { isMounted = false; };
+        }
+    }, [propProjects]);
 
     const handleReload = async () => {
         setIsReloading(true);
         if (onReloadProjects) {
             await onReloadProjects();
         }
-        const data = await fetchProjects();
+        const data = await fetchProjects(true);
         setProjectList(data);
         setIsReloading(false);
     };
@@ -63,7 +96,7 @@ const AppsPage: React.FC<AppsPageProps> = ({ onSelectApp, isAdmin, onAddNewApp, 
         });
     }, [searchQuery, activeCategory, projectList]);
 
-    const featuredApp = projectList.find(p => p.isFeatured) || projectList.find(p => p.id === 'ausbildungsplaner') || projectList[0];
+    const featuredApp = projectList.find(p => p.isFeatured) || projectList[0];
 
     const handleAppClick = (project: Project) => {
         if (onSelectApp) {
@@ -89,7 +122,7 @@ const AppsPage: React.FC<AppsPageProps> = ({ onSelectApp, isAdmin, onAddNewApp, 
             </div>
 
             {/* Featured App Spotlight Banner */}
-            {activeCategory === 'Alle' && !searchQuery && (
+            {!isLoading && featuredApp && activeCategory === 'Alle' && !searchQuery && (
                 <div className="max-w-6xl mx-auto mb-16">
                     <div 
                         onClick={() => handleAppClick(featuredApp)}
@@ -191,7 +224,27 @@ const AppsPage: React.FC<AppsPageProps> = ({ onSelectApp, isAdmin, onAddNewApp, 
             </div>
 
             {/* Grid Section */}
-            {filteredProjects.length > 0 ? (
+            {isLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                        <div key={i} className="bg-white dark:bg-gray-800/90 rounded-3xl p-6 border border-gray-200/80 dark:border-gray-700/80 shadow-lg animate-pulse h-64 flex flex-col justify-between">
+                            <div>
+                                <div className="flex items-start justify-between gap-4 mb-4">
+                                    <div className="w-16 h-16 rounded-2xl bg-gray-200 dark:bg-gray-700" />
+                                    <div className="w-20 h-6 rounded-full bg-gray-200 dark:bg-gray-700" />
+                                </div>
+                                <div className="h-6 w-3/4 bg-gray-200 dark:bg-gray-700 rounded-lg mb-2" />
+                                <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded-lg mb-2" />
+                                <div className="h-4 w-2/3 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+                            </div>
+                            <div className="flex justify-between items-center pt-4 border-t border-gray-100 dark:border-gray-700/50">
+                                <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
+                                <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : filteredProjects.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
                     {filteredProjects.map((project) => (
                         <div key={project.id} className="animate-reveal">
