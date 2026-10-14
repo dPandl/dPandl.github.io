@@ -124,7 +124,7 @@
     "longDescription": "Zeiterfassung ohne Cloud-Zwang. Erfasse Stempelzeiten oder projektspezifische Stunden direkt im Browser. Generiere mit einem Klick übersichtliche Monatsberichte und exportiere diese als druckfertiges PDF.",
     "color": "#14b8a6",
     "category": "Alltagshelfer",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "releaseDate": "13.08.2025",
     "updatedDate": "17.08.2025",
     "supportedPlatforms": "both",
