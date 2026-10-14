@@ -312,7 +312,7 @@
     "title": "WebApp Sandbox",
     "tagline": "",
     "description": "Ein sicherer Ort, um Web-Technologien und APIs zu testen und zu experimentieren.",
-    "longDescription": "Eine App um html alApps auf deinem Gerät zu installieren.",
+    "longDescription": "Eine App um html Apps in einer PWA umgebung auf deinem Gerät zu nutzen.",
     "color": "#f59e0b",
     "category": "Tools",
     "version": "0",
