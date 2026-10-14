@@ -12,6 +12,7 @@ import AdminLoginModal from './components/AdminLoginModal';
 import ProjectFormModal from './components/ProjectFormModal';
 import ConfirmDeleteModal from './components/ConfirmDeleteModal';
 import AdminPublishBar from './components/AdminPublishBar';
+import ReviewChangesModal from './components/ReviewChangesModal';
 import { initialProjects, fetchProjects, invalidateProjectsCache, Project } from './data/projects';
 import { isAdminLoggedIn, commitProjectsToGitHub } from './services/githubAdminService';
 
@@ -49,6 +50,7 @@ const App: React.FC = () => {
     const [isPublishing, setIsPublishing] = useState<boolean>(false);
     const [publishError, setPublishError] = useState<string | null>(null);
     const [publishSuccess, setPublishSuccess] = useState<boolean>(false);
+    const [isReviewOpen, setIsReviewOpen] = useState<boolean>(false);
     const savedScrollPos = React.useRef<number>(0);
 
     useEffect(() => {
@@ -157,37 +159,74 @@ const App: React.FC = () => {
 
     // Admin Handlers (Sofortige lokale Speicherung ohne Netzwerkblockade)
     const handleSaveProject = (projectToSave: Project) => {
-        let updatedList: Project[] = [];
-        
-        // Wenn isFeatured aktiv ist, bei allen anderen deaktivieren
-        if (projectToSave.isFeatured) {
-            projectList.forEach(p => { p.isFeatured = false; });
-        }
+        try {
+            let updatedList: Project[] = [];
+            
+            // Wenn isFeatured aktiv ist, bei allen anderen Projekten deaktivieren (immutables Kopieren)
+            const currentList = projectList.map(p => ({
+                ...p,
+                isFeatured: projectToSave.isFeatured ? false : p.isFeatured
+            }));
 
-        const existingIdx = projectList.findIndex(p => p.id === projectToSave.id);
-        if (existingIdx >= 0) {
-            updatedList = [...projectList];
-            updatedList[existingIdx] = projectToSave;
-        } else {
-            updatedList = [projectToSave, ...projectList];
-        }
+            const existingIdx = currentList.findIndex(p => p.id === projectToSave.id);
+            if (existingIdx >= 0) {
+                updatedList = [...currentList];
+                updatedList[existingIdx] = projectToSave;
+            } else {
+                updatedList = [projectToSave, ...currentList];
+            }
 
-        setProjectList(updatedList);
-        localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(updatedList));
-        setPublishError(null);
-        setPublishSuccess(false);
+            setProjectList(updatedList);
+            try {
+                localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(updatedList));
+            } catch (e) {
+                console.warn('Draft konnte nicht im localStorage gespeichert werden:', e);
+            }
+            setPublishError(null);
+            setPublishSuccess(false);
+            closeModal();
+        } catch (err: any) {
+            console.error('Fehler beim lokalen Speichern:', err);
+            closeModal();
+        }
     };
 
     const handleDeleteProject = () => {
         if (!deletingProject) return;
         const updatedList = projectList.filter(p => p.id !== deletingProject.id);
         setProjectList(updatedList);
-        localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(updatedList));
+        try {
+            localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(updatedList));
+        } catch (e) {}
         setPublishError(null);
         setPublishSuccess(false);
+        closeModal();
         if (route.selectedAppId === deletingProject.id) {
             window.location.hash = '#apps';
         }
+    };
+
+    const handleRevertSingleApp = (appId: string) => {
+        const orig = originalProjects.find(o => o.id === appId);
+        let updatedList: Project[] = [];
+        if (!orig) {
+            // App war neu hinzugefügt -> wieder entfernen
+            updatedList = projectList.filter(p => p.id !== appId);
+        } else {
+            // App war geändert oder gelöscht -> auf orig zurücksetzen
+            const idx = projectList.findIndex(p => p.id === appId);
+            if (idx >= 0) {
+                updatedList = [...projectList];
+                updatedList[idx] = orig;
+            } else {
+                // war gelöscht, wieder anfügen
+                updatedList = [...projectList, orig];
+            }
+        }
+        setProjectList(updatedList);
+        try {
+            localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(updatedList));
+        } catch (e) {}
     };
 
     const handlePublishToGitHub = async () => {
@@ -214,7 +253,9 @@ const App: React.FC = () => {
             
             await commitProjectsToGitHub(projectList, commitMessage);
             setOriginalProjects(projectList);
-            localStorage.removeItem(DRAFT_STORAGE_KEY);
+            try {
+                localStorage.removeItem(DRAFT_STORAGE_KEY);
+            } catch (e) {}
             invalidateProjectsCache();
             setPublishSuccess(true);
             setTimeout(() => setPublishSuccess(false), 5000);
@@ -228,9 +269,12 @@ const App: React.FC = () => {
     const handleDiscardChanges = () => {
         if (window.confirm('Möchtest du wirklich alle ungespeicherten Entwurfs-Änderungen verwerfen? Alle Apps werden auf den Stand von GitHub zurückgesetzt.')) {
             setProjectList(originalProjects);
-            localStorage.removeItem(DRAFT_STORAGE_KEY);
+            try {
+                localStorage.removeItem(DRAFT_STORAGE_KEY);
+            } catch (e) {}
             setPublishError(null);
             setPublishSuccess(false);
+            setIsReviewOpen(false);
         }
     };
 
@@ -243,8 +287,11 @@ const App: React.FC = () => {
         const data = await fetchProjects(true);
         setOriginalProjects(data);
         setProjectList(data);
-        localStorage.removeItem(DRAFT_STORAGE_KEY);
+        try {
+            localStorage.removeItem(DRAFT_STORAGE_KEY);
+        } catch (e) {}
         setPublishError(null);
+        setIsReviewOpen(false);
     };
 
     const selectedApp: Project | undefined = route.selectedAppId 
@@ -266,6 +313,7 @@ const App: React.FC = () => {
                     publishSuccess={publishSuccess}
                     onPublish={handlePublishToGitHub}
                     onDiscard={handleDiscardChanges}
+                    onOpenReview={() => setIsReviewOpen(true)}
                 />
             )}
 
@@ -336,6 +384,15 @@ const App: React.FC = () => {
                 onClose={closeModal}
                 onConfirm={handleDeleteProject}
                 appTitle={deletingProject?.title || ''}
+            />
+            <ReviewChangesModal
+                isOpen={isReviewOpen}
+                onClose={() => setIsReviewOpen(false)}
+                originalProjects={originalProjects}
+                currentProjects={projectList}
+                onPublish={handlePublishToGitHub}
+                isPublishing={isPublishing}
+                onRevertSingleApp={handleRevertSingleApp}
             />
             <CookieBanner onDatenschutzClick={() => openModal('datenschutz')} />
         </div>
