@@ -200,31 +200,26 @@
   {
     "id": "kitalytics",
     "title": "Kitalytics",
-    "tagline": "Anwesenheiten erfassen & Auslastung optimal analysieren.",
+    "tagline": "Datenvisualisierung für Kindergärten. Einfach, sicher und aufschlussreich.",
     "description": "Erfassen Sie Anwesenheiten, analysieren Sie die Auslastung und optimieren Sie Ihre Planung.",
-    "longDescription": "Kitalytics bringt datengestützte Einblicke in den Kita-Alltag. Erfassen Sie Anwesenheitszeiten, Betreuungsschlüssel und Auslastungen, um Personalressourcen vorausschauend und bedarfsgerecht zu planen.",
+    "longDescription": "Erfassen Sie Anwesenheiten, analysieren Sie die Auslastung und optimieren Sie Ihre Planung – alles datenschutzkonform und lokal auf Ihrem Gerät.",
     "color": "#0d9488",
     "category": "Kindergarten",
-    "version": "1.1.0",
-    "releaseDate": "01.06.2024",
-    "updatedDate": "02.08.2024",
+    "version": "1.0.1",
+    "releaseDate": "29.08.2025",
+    "updatedDate": "06.02.2026",
     "supportedPlatforms": "desktop",
     "developer": "by-dp",
+    "isFeatured": false,
     "icon": "",
     "openUrl": "https://by-dp.de/Kitalytics/",
     "downloadUrl": "",
     "downloadFilename": "",
     "status": "",
     "features": [
-      "Echtzeit-Statistiken zur Kita-Auslastung",
-      "Betreuungsschlüssel-Rechner",
-      "Graphische Auswertungen & Berichte",
       "Lokale Datenspeicherung auf dem Einrichtungsgerät"
     ],
-    "screenshots": [
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&q=80"
-    ],
-    "isFeatured": false
+    "screenshots": []
   },
   {
     "id": "erzieher-app",
@@ -234,11 +229,12 @@
     "longDescription": "Die Erzieher App unterstützt pädagogisches Fachpersonal bei der täglichen Entwicklungsdokumentation, Portfolioarbeit und Angebotsplanung. Sparen Sie wertvolle Zeit bei Verwaltungsaufgaben.",
     "color": "#3b82f6",
     "category": "Kindergarten",
-    "version": "0.9.0 (Beta)",
-    "releaseDate": "Demnächst",
-    "updatedDate": "08.08.2024",
+    "version": "0.1.1.1",
+    "releaseDate": "03.09.2025",
+    "updatedDate": "23.10.2025",
     "supportedPlatforms": "both",
     "developer": "by-dp",
+    "isFeatured": false,
     "icon": "",
     "openUrl": "https://by-dp.de/erzieher-app/",
     "downloadUrl": "",
@@ -250,33 +246,28 @@
       "Druck- und PDF-Export für Elterngeschpräche",
       "Offline-First Architektur"
     ],
-    "screenshots": [],
-    "isFeatured": false
+    "screenshots": []
   },
   {
     "id": "webapp-sandbox",
     "title": "WebApp Sandbox",
-    "tagline": "Experimentelle Web-Technologien & APIs testen.",
+    "tagline": "",
     "description": "Ein sicherer Ort, um Web-Technologien und APIs zu testen und zu experimentieren.",
-    "longDescription": "Die WebApp Sandbox ist eine Spielwiese für moderne Web-APIs (Web Bluetooth, Web Share, Service Worker, WebGL). Entwickler und Interessierte können hier experimentelle Features ausprobieren.",
+    "longDescription": "Eine App um html alApps auf deinem Gerät zu installieren.",
     "color": "#f59e0b",
     "category": "Tools",
-    "version": "0.5.0",
+    "version": "0",
     "releaseDate": "In Kürze",
     "updatedDate": "01.08.2024",
-    "supportedPlatforms": "desktop",
+    "supportedPlatforms": "both",
     "developer": "by-dp",
+    "isFeatured": false,
     "icon": "",
     "openUrl": "",
     "downloadUrl": "",
     "downloadFilename": "",
     "status": "In Entwicklung",
-    "features": [
-      "Live Code Editor & Preview",
-      "Zugriff auf moderne Browser APIs",
-      "Performance Benchmark-Tools"
-    ],
-    "screenshots": [],
-    "isFeatured": false
+    "features": [],
+    "screenshots": []
   }
 ]

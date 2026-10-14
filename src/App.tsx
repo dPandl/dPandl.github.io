@@ -11,8 +11,11 @@ import Footer from './components/Footer';
 import AdminLoginModal from './components/AdminLoginModal';
 import ProjectFormModal from './components/ProjectFormModal';
 import ConfirmDeleteModal from './components/ConfirmDeleteModal';
+import AdminPublishBar from './components/AdminPublishBar';
 import { initialProjects, fetchProjects, invalidateProjectsCache, Project } from './data/projects';
 import { isAdminLoggedIn, commitProjectsToGitHub } from './services/githubAdminService';
+
+const DRAFT_STORAGE_KEY = 'by_dp_admin_draft_projects';
 
 type ModalType = 'impressum' | 'datenschutz' | 'adminLogin' | 'projectForm' | 'confirmDelete' | null;
 export type PageType = 'home' | 'apps';
@@ -38,10 +41,14 @@ const App: React.FC = () => {
     const [activeModal, setActiveModal] = useState<ModalType>(null);
     const [route, setRoute] = useState<RouteState>(parseHash());
     const [projectList, setProjectList] = useState<Project[]>(initialProjects);
+    const [originalProjects, setOriginalProjects] = useState<Project[]>(initialProjects);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [isAdmin, setIsAdmin] = useState<boolean>(isAdminLoggedIn());
     const [editingProject, setEditingProject] = useState<Project | null>(null);
     const [deletingProject, setDeletingProject] = useState<Project | null>(null);
+    const [isPublishing, setIsPublishing] = useState<boolean>(false);
+    const [publishError, setPublishError] = useState<string | null>(null);
+    const [publishSuccess, setPublishSuccess] = useState<boolean>(false);
     const savedScrollPos = React.useRef<number>(0);
 
     useEffect(() => {
@@ -49,6 +56,21 @@ const App: React.FC = () => {
         setIsLoading(true);
         fetchProjects().then(data => {
             if (isMounted) {
+                setOriginalProjects(data);
+                // Entwurf aus dem localStorage wiederherstellen, falls vorhanden
+                const savedDraft = localStorage.getItem(DRAFT_STORAGE_KEY);
+                if (savedDraft && isAdminLoggedIn()) {
+                    try {
+                        const parsed = JSON.parse(savedDraft);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            setProjectList(parsed);
+                            setIsLoading(false);
+                            return;
+                        }
+                    } catch (e) {
+                        console.warn('Fehler beim Laden des Admin-Entwurfs:', e);
+                    }
+                }
                 setProjectList(data);
                 setIsLoading(false);
             }
@@ -103,11 +125,41 @@ const App: React.FC = () => {
         }
     };
 
-    // Admin Handlers
-    const handleSaveProject = async (projectToSave: Project) => {
+    // Berechne Anzahl der ungespeicherten Entwurfs-Änderungen
+    const pendingCount = React.useMemo(() => {
+        if (!isAdmin) return 0;
+        let count = 0;
+        projectList.forEach(p => {
+            const orig = originalProjects.find(o => o.id === p.id);
+            if (!orig || JSON.stringify(orig) !== JSON.stringify(p)) {
+                count++;
+            }
+        });
+        originalProjects.forEach(o => {
+            if (!projectList.some(p => p.id === o.id)) {
+                count++;
+            }
+        });
+        return count;
+    }, [projectList, originalProjects, isAdmin]);
+
+    // Vor unbeabsichtigtem Schließen/Neuladen des Tabs warnen
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (pendingCount > 0 && isAdmin) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [pendingCount, isAdmin]);
+
+    // Admin Handlers (Sofortige lokale Speicherung ohne Netzwerkblockade)
+    const handleSaveProject = (projectToSave: Project) => {
         let updatedList: Project[] = [];
         
-        // If isFeatured is set to true for projectToSave, set it to false for all other projects
+        // Wenn isFeatured aktiv ist, bei allen anderen deaktivieren
         if (projectToSave.isFeatured) {
             projectList.forEach(p => { p.isFeatured = false; });
         }
@@ -120,28 +172,79 @@ const App: React.FC = () => {
             updatedList = [projectToSave, ...projectList];
         }
 
-        await commitProjectsToGitHub(updatedList, `App updated/created: ${projectToSave.title}`);
-        invalidateProjectsCache();
-        const freshList = await fetchProjects(true);
-        setProjectList(freshList.length > 0 ? freshList : updatedList);
+        setProjectList(updatedList);
+        localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(updatedList));
+        setPublishError(null);
+        setPublishSuccess(false);
     };
 
-    const handleDeleteProject = async () => {
+    const handleDeleteProject = () => {
         if (!deletingProject) return;
         const updatedList = projectList.filter(p => p.id !== deletingProject.id);
-        await commitProjectsToGitHub(updatedList, `App deleted: ${deletingProject.title}`);
-        invalidateProjectsCache();
-        const freshList = await fetchProjects(true);
-        setProjectList(freshList.length > 0 ? freshList : updatedList);
+        setProjectList(updatedList);
+        localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(updatedList));
+        setPublishError(null);
+        setPublishSuccess(false);
         if (route.selectedAppId === deletingProject.id) {
             window.location.hash = '#apps';
         }
     };
 
+    const handlePublishToGitHub = async () => {
+        setIsPublishing(true);
+        setPublishError(null);
+        try {
+            const changedNames: string[] = [];
+            projectList.forEach(p => {
+                const orig = originalProjects.find(o => o.id === p.id);
+                if (!orig) {
+                    changedNames.push(`Neu: ${p.title}`);
+                } else if (JSON.stringify(orig) !== JSON.stringify(p)) {
+                    changedNames.push(`Update: ${p.title}`);
+                }
+            });
+            originalProjects.forEach(o => {
+                if (!projectList.some(p => p.id === o.id)) {
+                    changedNames.push(`Entfernt: ${o.title}`);
+                }
+            });
+
+            const summary = changedNames.slice(0, 3).join(', ') + (changedNames.length > 3 ? ` (+${changedNames.length - 3})` : '');
+            const commitMessage = `Web Admin: ${summary || `${pendingCount} Änderungen`}`;
+            
+            await commitProjectsToGitHub(projectList, commitMessage);
+            setOriginalProjects(projectList);
+            localStorage.removeItem(DRAFT_STORAGE_KEY);
+            invalidateProjectsCache();
+            setPublishSuccess(true);
+            setTimeout(() => setPublishSuccess(false), 5000);
+        } catch (err: any) {
+            setPublishError(err.message || 'Veröffentlichung auf GitHub fehlgeschlagen.');
+        } finally {
+            setIsPublishing(false);
+        }
+    };
+
+    const handleDiscardChanges = () => {
+        if (window.confirm('Möchtest du wirklich alle ungespeicherten Entwurfs-Änderungen verwerfen? Alle Apps werden auf den Stand von GitHub zurückgesetzt.')) {
+            setProjectList(originalProjects);
+            localStorage.removeItem(DRAFT_STORAGE_KEY);
+            setPublishError(null);
+            setPublishSuccess(false);
+        }
+    };
+
     const handleReloadProjects = async () => {
+        if (pendingCount > 0) {
+            const confirmed = window.confirm('Du hast noch ungespeicherte Entwürfe. Wenn du die Daten von GitHub neu lädst, gehen diese verloren. Fortfahren?');
+            if (!confirmed) return;
+        }
         invalidateProjectsCache();
         const data = await fetchProjects(true);
+        setOriginalProjects(data);
         setProjectList(data);
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+        setPublishError(null);
     };
 
     const selectedApp: Project | undefined = route.selectedAppId 
@@ -154,6 +257,17 @@ const App: React.FC = () => {
                 onNavigate={navigateTo}
                 activePage={route.page}
             />
+
+            {isAdmin && (
+                <AdminPublishBar
+                    pendingCount={pendingCount}
+                    isPublishing={isPublishing}
+                    publishError={publishError}
+                    publishSuccess={publishSuccess}
+                    onPublish={handlePublishToGitHub}
+                    onDiscard={handleDiscardChanges}
+                />
+            )}
 
             <main className="flex-grow">
                 {route.page === 'home' && <HomePage />}

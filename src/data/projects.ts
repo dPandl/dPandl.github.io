@@ -59,7 +59,7 @@ async function enrichWithGitHubReleases(projectsList: Project[]): Promise<Projec
                 if (res.ok) {
                     const release = await res.json();
                     const version = release.tag_name ? release.tag_name.replace(/^v/, '') : project.version;
-                    
+
                     let downloadUrl = project.downloadUrl;
                     let downloadFilename = project.downloadFilename;
                     const autoDownloadUrls = { ...project.downloadUrls };

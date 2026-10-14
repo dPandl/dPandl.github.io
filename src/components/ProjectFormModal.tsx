@@ -5,7 +5,7 @@ import { Project, PlatformSupport } from '../data/projects';
 interface ProjectFormModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSave: (project: Project) => Promise<void>;
+    onSave: (project: Project) => void | Promise<void>;
     projectToEdit?: Project | null;
 }
 
@@ -35,7 +35,6 @@ const emptyProject: Project = {
 const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, onSave, projectToEdit }) => {
     const [formData, setFormData] = useState<Project>(emptyProject);
     const [featureInput, setFeatureInput] = useState('');
-    const [isSaving, setIsSaving] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
 
     useEffect(() => {
@@ -126,14 +125,11 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
             return;
         }
 
-        setIsSaving(true);
         try {
             await onSave(formData);
-            setIsSaving(false);
             onClose();
         } catch (err: any) {
-            setIsSaving(false);
-            setErrorMsg(err.message || 'Fehler beim Speichern der App auf GitHub.');
+            setErrorMsg(err.message || 'Fehler beim Übernehmen der App.');
         }
     };
 
@@ -529,13 +525,11 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
                     </ul>
                 </div>
 
-                {/* GitHub Deployment Info Hint */}
-                <div className="p-3.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-xs text-cyan-700 dark:text-cyan-300 flex items-start gap-2.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-cyan-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                {/* Deployment Info Hint */}
+                <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-800 dark:text-amber-200 flex items-start gap-2.5">
+                    <span className="text-base shrink-0 mt-0.5">⚡</span>
                     <span>
-                        <strong>Hinweis:</strong> Nach dem Speichern wird die Änderung sofort auf GitHub committet. Es kann ca. 1–2 Minuten dauern, bis GitHub Pages die Live-Seite weltweit aktualisiert.
+                        <strong>Schneller Modus:</strong> Die App wird sofort im Browser übernommen. Du kannst ohne Wartezeit direkt weitere Apps bearbeiten und anschließend oben auf <strong>„Auf GitHub veröffentlichen“</strong> klicken.
                     </span>
                 </div>
 
@@ -551,20 +545,12 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
 
                     <button
                         type="submit"
-                        disabled={isSaving}
-                        className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-cyan-500/25 transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+                        className="w-full sm:w-auto px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-cyan-500/25 transition-all text-sm flex items-center justify-center gap-2 active:scale-95"
                     >
-                        {isSaving ? (
-                            <>
-                                <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                Committe auf GitHub...
-                            </>
-                        ) : (
-                            'Speichern & Veröffentlichen'
-                        )}
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Änderung übernehmen
                     </button>
                 </div>
             </form>
