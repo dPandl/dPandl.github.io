@@ -3,135 +3,143 @@ import React from 'react';
 const DatenschutzContent: React.FC = () => {
     return (
         <div className="space-y-4 text-base leading-relaxed">
-            <p><strong>Stand:</strong> Mai 2024</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+                <strong>Stand:</strong> November 2026
+            </p>
 
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">1. Name und Anschrift des Verantwortlichen</h3>
             <p>
-                Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO), des Telekommunikation-Digitale-Dienste-Datenschutz-Gesetzes (TDDDG) und anderer nationaler Datenschutzgesetze der Mitgliedstaaten sowie sonstiger datenschutzrechtlicher Bestimmungen ist:
+                Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO), des Telekommunikation-Digitale-Dienste-Datenschutz-Gesetzes (TDDDG) und sonstiger datenschutzrechtlicher Bestimmungen ist:
             </p>
             <p>
                 Pascal Pander<br />
                 Bahnhofstraße 39<br />
-                78532 Tuttlingen
+                78532 Tuttlingen<br />
+                E-Mail: <a href="mailto:pascalpander@by-dp.de" className="text-cyan-600 dark:text-cyan-400 hover:underline">pascalpander@by-dp.de</a>
             </p>
 
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">2. Kontaktmöglichkeit</h3>
             <p>
-                Bei Fragen zum Datenschutz können Sie uns unter folgender E-Mail-Adresse kontaktieren:
-            </p>
-            <p>
-                pascalpander@by-dp.de
+                Bei Fragen zum Datenschutz auf dieser Website können Sie uns jederzeit unter der folgenden E-Mail-Adresse kontaktieren:<br />
+                <a href="mailto:pascalpander@by-dp.de" className="font-semibold text-cyan-600 dark:text-cyan-400 hover:underline">pascalpander@by-dp.de</a>
             </p>
 
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">3. Allgemeines zur Datenverarbeitung</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">3. Allgemeines zur Datenverarbeitung und Rechtsgrundlagen</h3>
             <p>
                 Der Schutz Ihrer persönlichen Daten ist uns ein wichtiges Anliegen. Wir verarbeiten Ihre personenbezogenen Daten ausschließlich im Rahmen der gesetzlichen Bestimmungen, insbesondere der DSGVO und des TDDDG.
             </p>
             <p>
-                Grundsätzlich ist die Verarbeitung personenbezogener Daten verboten, es sei denn, ein Gesetz erlaubt dies ausdrücklich oder Sie haben in die Verarbeitung eingewilligt.
+                Grundsätzlich gilt das Verbot mit Erlaubnisvorbehalt. Soweit wir personenbezogene Daten verarbeiten, stützen wir uns auf folgende Rechtsgrundlagen:
             </p>
-            <h4 className="font-semibold text-gray-800 dark:text-gray-100">Rechtsgrundlagen der Datenverarbeitung:</h4>
-            <p>
-                Soweit wir für Verarbeitungsvorgänge personenbezogener Daten eine Einwilligung der betroffenen Person einholen, dient Art. 6 Abs. 1 lit. a DSGVO als Rechtsgrundlage.
-                Bei der Verarbeitung von personenbezogenen Daten, die zur Erfüllung eines Vertrages, dessen Vertragspartei die betroffene Person ist, erforderlich ist, dient Art. 6 Abs. 1 lit. b DSGVO als Rechtsgrundlage. Dies gilt auch für Verarbeitungsvorgänge, die zur Durchführung vorvertraglicher Maßnahmen erforderlich sind.
-                Soweit eine Verarbeitung personenbezogener Daten zur Erfüllung einer rechtlichen Verpflichtung erforderlich ist, der unser Unternehmen unterliegt, dient Art. 6 Abs. 1 lit. c DSGVO als Rechtsgrundlage.
-                Ist die Verarbeitung zur Wahrung eines berechtigten Interesses unseres Unternehmens oder eines Dritten erforderlich und überwiegen die Interessen, Grundrechte und Grundfreiheiten des Betroffenen das erstgenannte Interesse nicht, so dient Art. 6 Abs. 1 lit. f DSGVO als Rechtsgrundlage für die Verarbeitung.
-            </p>
+            <ul className="list-disc list-inside space-y-2 pl-2">
+                <li>
+                    <strong>Einwilligung (Art. 6 Abs. 1 lit. a DSGVO, § 25 Abs. 1 TDDDG):</strong> Sofern Sie uns eine ausdrückliche Einwilligung erteilt haben.
+                </li>
+                <li>
+                    <strong>Vertragserfüllung oder vorvertragliche Maßnahmen (Art. 6 Abs. 1 lit. b DSGVO):</strong> Wenn die Datenverarbeitung zur Bereitstellung gewünschter Services erforderlich ist.
+                </li>
+                <li>
+                    <strong>Rechtliche Verpflichtung (Art. 6 Abs. 1 lit. c DSGVO):</strong> Sofern eine rechtliche Pflicht zur Verarbeitung besteht.
+                </li>
+                <li>
+                    <strong>Berechtigte Interessen (Art. 6 Abs. 1 lit. f DSGVO):</strong> Wenn die Verarbeitung zur Wahrung unserer berechtigten Interessen erforderlich ist und keine überwiegenden schutzwürdigen Interessen der betroffenen Person entgegenstehen.
+                </li>
+            </ul>
 
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">4. Ihre Rechte als betroffene Person</h3>
             <p>
-                Werden personenbezogene Daten von Ihnen verarbeitet, sind Sie Betroffener im Sinne der DSGVO und es stehen Ihnen folgende Rechte zu:
+                Ihnen stehen nach der DSGVO folgende Rechte bezüglich Ihrer verarbeiteten Daten zu:
             </p>
             <ul className="list-disc list-inside space-y-2 pl-2">
                 <li>
-                    <strong>Recht auf Auskunft (Art. 15 DSGVO):</strong> Sie können eine Bestätigung darüber verlangen, ob personenbezogene Daten, die Sie betreffen, von uns verarbeitet werden. Ist dies der Fall, haben Sie das Recht auf Auskunft über diese personenbezogenen Daten und auf weitere Informationen.
+                    <strong>Recht auf Auskunft (Art. 15 DSGVO):</strong> Sie können jederzeit Auskunft über die von uns zu Ihrer Person verarbeiteten Daten verlangen.
                 </li>
                 <li>
-                    <strong>Recht auf Berichtigung (Art. 16 DSGVO):</strong> Sie haben das Recht, die Berichtigung und/oder Vervollständigung der Sie betreffenden unrichtigen oder unvollständigen Daten zu verlangen.
+                    <strong>Recht auf Berichtigung (Art. 16 DSGVO):</strong> Sie haben das Recht auf unverzügliche Berichtigung unrichtiger oder Vervollständigung unvollständiger personenbezogener Daten.
                 </li>
                 <li>
-                    <strong>Recht auf Löschung (Art. 17 DSGVO):</strong> Sie können die Löschung der Sie betreffenden personenbezogenen Daten verlangen, wenn bestimmte Gründe vorliegen.
+                    <strong>Recht auf Löschung (Art. 17 DSGVO):</strong> Sie können unter den gesetzlichen Voraussetzungen die unverzügliche Löschung Ihrer Daten verlangen.
                 </li>
                 <li>
-                    <strong>Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO):</strong> Sie können die Einschränkung der Verarbeitung der Sie betreffenden personenbezogenen Daten verlangen, wenn bestimmte Gründe vorliegen.
+                    <strong>Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO):</strong> Sie können die Einschränkung der Verarbeitung verlangen, z. B. für die Dauer einer Prüfung im Falle eines Bestreitens der Richtigkeit.
                 </li>
                 <li>
-                    <strong>Recht auf Datenübertragbarkeit (Art. 20 DSGVO):</strong> Sie haben das Recht, die Sie betreffenden personenbezogenen Daten, die Sie uns bereitgestellt haben, in einem strukturierten, gängigen und maschinenlesbaren Format zu erhalten, und Sie haben das Recht, diese Daten einem anderen Verantwortlichen zu übermitteln.
+                    <strong>Recht auf Datenübertragbarkeit (Art. 20 DSGVO):</strong> Sie haben das Recht, Daten, die Sie uns bereitgestellt haben, in einem gängigen, maschinenlesbaren Format zu erhalten oder an einen Dritten übermitteln zu lassen.
                 </li>
                 <li>
-                    <strong>Recht auf Widerspruch (Art. 21 DSGVO):</strong> Sie haben das Recht, aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit gegen die Verarbeitung der Sie betreffenden personenbezogenen Daten Widerspruch einzulegen.
+                    <strong>Widerspruchsrecht (Art. 21 DSGVO):</strong> Soweit die Verarbeitung auf Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse) beruht, haben Sie das Recht, aus Gründen, die sich aus Ihrer besonderen Situation ergeben, jederzeit Widerspruch einzulegen.
                 </li>
                 <li>
-                    <strong>Recht auf Widerruf der datenschutzrechtlichen Einwilligungserklärung (Art. 7 Abs. 3 DSGVO):</strong> Sie haben das Recht, Ihre einmal erteilte Einwilligung zur Datenverarbeitung jederzeit zu widerrufen. Durch den Widerruf der Einwilligung wird die Rechtmäßigkeit der aufgrund der Einwilligung bis zum Widerruf erfolgten Verarbeitung nicht berührt.
+                    <strong>Widerrufsrecht bei Einwilligungen (Art. 7 Abs. 3 DSGVO):</strong> Eine einmal erteilte Einwilligung können Sie jederzeit mit Wirkung für die Zukunft widerrufen.
                 </li>
                 <li>
-                    <strong>Recht auf Beschwerde bei einer Aufsichtsbehörde (Art. 77 DSGVO):</strong> Unbeschadet eines anderweitigen verwaltungsrechtlichen oder gerichtlichen Rechtsbehelfs steht Ihnen das Recht auf Beschwerde bei einer Aufsichtsbehörde, insbesondere in dem Mitgliedstaat Ihres Aufenthaltsorts, Ihres Arbeitsplatzes oder des Orts des mutmaßlichen Verstoßes, zu, wenn Sie der Ansicht sind, dass die Verarbeitung der Sie betreffenden personenbezogenen Daten gegen die DSGVO verstößt.
+                    <strong>Beschwerderecht bei einer Aufsichtsbehörde (Art. 77 DSGVO):</strong> Sie haben unbeschadet anderer Rechtsbehelfe das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren, wenn Sie der Ansicht sind, dass die Verarbeitung Ihrer personenbezogenen Daten gegen die DSGVO verstößt. Zuständig ist in der Regel die Aufsichtsbehörde Ihres üblichen Aufenthaltsortes oder unseres Sitzes (in Baden-Württemberg: Der Landesbeauftragte für den Datenschutz und die Informationsfreiheit Baden-Württemberg).
                 </li>
             </ul>
 
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">5. Hosting und Server-Logfiles</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">5. Hosting und Server-Logfiles (GitHub Pages)</h3>
             <p>
-                Unsere Website wird über <strong>GitHub Pages</strong> gehostet. GitHub, Inc. ist der Betreiber dieser Hosting-Dienste.
+                Unsere Website wird über <strong>GitHub Pages</strong> bereitgestellt. Anbieter ist die GitHub Inc., 88 Colin P Kelly Jr St, San Francisco, CA 94107, USA (bzw. für Nutzer im EWR: GitHub B.V., Prins Bernhardplein 200, 1097 JB Amsterdam, Niederlande).
             </p>
             <p>
-                Bei jedem Zugriff auf unsere Website werden automatisch Informationen in sogenannten Server-Logfiles gespeichert, die Ihr Browser an uns übermittelt. Dies sind insbesondere:
+                Beim Aufruf unserer Website erfasst GitHub automatisch Informationen in Server-Logfiles, die Ihr Browser übermittelt. Dies umfasst insbesondere:
             </p>
             <ul className="list-disc list-inside space-y-2 pl-2">
-                <li>IP-Adresse des zugreifenden Rechners</li>
-                <li>Datum und Uhrzeit des Zugriffs</li>
-                <li>URL der besuchten Seite</li>
-                <li>Menge der übertragenen Daten in Byte</li>
-                <li>Information über die Quelle, über die Sie auf die Seite gelangt sind</li>
-                <li>Angabe des Browsers</li>
-                <li>Information zum Betriebssystem</li>
+                <li>IP-Adresse des anfragenden Geräts</li>
+                <li>Datum und Uhrzeit des Abrufs</li>
+                <li>Name und URL der abgerufenen Datei / Unterseite</li>
+                <li>Übertragene Datenmenge</li>
+                <li>Zugriffsstatus / HTTP-Statuscode</li>
+                <li>Referrer-URL (die zuvor besuchte Seite)</li>
+                <li>Browsertyp und -version sowie Betriebssystem</li>
             </ul>
             <p>
-                GitHub protokolliert Ihre IP-Adresse aus Sicherheitsgründen, unabhängig davon, ob Sie bei GitHub angemeldet sind oder nicht. Diese Daten werden ausschließlich zu Sicherheitszwecken von GitHub erhoben und gespeichert. Wir haben keinen direkten Zugriff auf diese Logfiles und werten diese nicht für eigene Zwecke aus. Eine Zusammenführung dieser Daten mit anderen Datenquellen wird von uns nicht vorgenommen.
+                GitHub protokolliert diese Daten, um die Stabilität, Sicherheit und fehlerfreie Auslieferung der Dienste zu gewährleisten. Wir haben keinen direkten Zugriff auf diese Logfiles und führen keine personenbezogene Auswertung oder Zusammenführung mit anderen Datenquellen durch.
             </p>
             <p>
-                Die Rechtsgrundlage für die Speicherung dieser Daten durch GitHub ist das berechtigte Interesse an der Gewährleistung der Sicherheit und Funktionsfähigkeit der Website gem. Art. 6 Abs. 1 lit. f DSGVO und § 19 TDDDG. Ein Auftragsverarbeitungsvertrag mit GitHub ist im Rahmen der Nutzung von GitHub Pages nicht erforderlich, da die Verarbeitung der Logfiles primär dem Interesse von GitHub an der Bereitstellung und Sicherung seiner Dienste dient.
-            </p>
-
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">6. SSL-Verschlüsselung (HTTPS)</h3>
-            <p>
-                Unsere Website nutzt aus Sicherheitsgründen und zum Schutz der Übertragung vertraulicher Inhalte, wie zum Beispiel Anfragen, die Sie an uns senden, eine SSL-bzw. TLS-Verschlüsselung. Dies erkennen Sie daran, dass die Adresszeile des Browsers von „http://“ auf „https://“ wechselt und an dem Schloss-Symbol in Ihrer Browserzeile. Durch diese Verschlüsselung können die Daten, die Sie an uns übermitteln, nicht von Dritten mitgelesen werden. Dies entspricht den Sicherheitsvorkehrungen gemäß § 19 Abs. 4 TDDDG.
+                Die Datenverarbeitung erfolgt auf Grundlage unseres berechtigten Interesses an einer sicheren, schnellen und zuverlässigen Bereitstellung unserer Website gemäß Art. 6 Abs. 1 lit. f DSGVO.
             </p>
 
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">7. Cookies und lokale Speichertechnologien (localStorage)</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">6. SSL- bzw. TLS-Verschlüsselung (HTTPS)</h3>
             <p>
-                Unsere Website verwendet keine Cookies im herkömmlichen Sinne für Tracking- oder Analysezwecke. Stattdessen nutzen wir den lokalen Speicher Ihres Browsers (localStorage) für die Speicherung nutzerzentrierter Präferenzen.
+                Diese Website nutzt aus Sicherheitsgründen und zum Schutz der Übertragung vertraulicher Inhalte eine SSL- bzw. TLS-Verschlüsselung. Eine verschlüsselte Verbindung erkennen Sie daran, dass die Adresszeile des Browsers von „http://“ auf „https://“ wechselt und an dem Schloss-Symbol in Ihrer Browserzeile. Wenn die Verschlüsselung aktiviert ist, können Daten, die Sie übermitteln, nicht von Dritten mitgelesen werden.
+            </p>
+
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">7. Lokale Speichertechnologien (localStorage) &amp; Cookie-Hinweis</h3>
+            <p>
+                Unsere Website setzt keine klassischen Tracking-, Marketing- oder Werbe-Cookies ein. Zur Bereitstellung nutzerfreundlicher Grundfunktionen greifen wir auf den lokalen Speicher Ihres Browsers (<code>localStorage</code>) zurück.
             </p>
             <p>
-                Wir speichern im <code>localStorage</code> folgende Informationen:
+                Darin werden ausschließlich folgende rein technische Einstellungen gespeichert:
             </p>
             <ul className="list-disc list-inside space-y-2 pl-2">
                 <li>
-                    <strong>Akzeptanz des Cookie-Banners:</strong> Diese Information dient dazu, sich zu merken, dass Sie unser Cookie-Banner akzeptiert haben, um es Ihnen bei zukünftigen Besuchen nicht erneut anzuzeigen.
+                    <strong>Cookie-/Datenschutz-Status:</strong> Speichert die Kenntnisnahme des Hinweises, damit der Dialog bei weiteren Aufrufen nicht erneut eingeblendet wird.
                 </li>
                 <li>
-                    <strong>Darkmode/Lightmode Einstellung:</strong> Diese Information speichert Ihre bevorzugte Darstellung der Website (helles oder dunkles Design).
+                    <strong>Theme-Einstellung (Dark-/Lightmode):</strong> Speichert Ihre bevorzugte Ansicht der Website (helles oder dunkles Design).
                 </li>
             </ul>
             <p>
-                Die Speicherung dieser Informationen im <code>localStorage</code> ist technisch notwendig, um Ihnen eine nutzerfreundliche und konsistente Erfahrung auf unserer Website zu ermöglichen, ohne dass hierfür eine gesonderte Einwilligung erforderlich wäre (§ 25 Abs. 2 TDDDG). Eine Auswertung zu Marketingzwecken oder eine Weitergabe an Dritte findet nicht statt.
+                Der Zugriff auf den lokalen Speicher erfolgt ausschließlich für technisch erforderliche Funktionen zur Bereitstellung des von Ihnen ausdrücklich gewünschten Dienstes gemäß § 25 Abs. 2 Nr. 2 TDDDG. Eine Verarbeitung zu Marketing- oder Analysezwecken oder eine Weitergabe an Dritte findet nicht statt.
             </p>
 
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">8. Einbindung externer Schriften und Dateien</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">8. Lokale Bereitstellung von Schriften und Assets</h3>
             <p>
-                Alle Schriften und Dateien, die auf unserer Website verwendet werden, werden lokal von unserem GitHub Pages Projekt geladen. Es erfolgt keine Nachladung von externen Servern (z. B. Google Fonts) oder die Einbindung von Drittanbieter-CDNs. Dies stellt sicher, dass beim Laden unserer Website keine personenbezogenen Daten an Dritte übertragen werden und keine Einwilligungspflicht nach § 25 Abs. 1 TDDDG entsteht.
+                Alle auf dieser Website verwendeten Schriften, Icons und Skripte werden lokal über unser eigenes GitHub-Pages-Projekt ausgeliefert. Es erfolgt kein dynamisches Nachladen von externen Schriftenservern (wie Google Fonts) oder Drittanbieter-CDNs. Dadurch werden beim Laden der Website keine personenbezogenen Daten an externe Schriftanbieter übermittelt.
             </p>
 
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">9. Hinweis zu verlinkten Web-Apps/Unterseiten</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">9. Verlinkte Anwendungen und externe Dienste</h3>
             <p>
-                Unsere Hauptseite <code>by-dp.de</code> dient primär als eine Art "Launcher" für verschiedene separate Web-Anwendungen (z. B. <code>by-dp.de/Party-Games</code>).
+                Unsere Website <code>by-dp.de</code> fungiert unter anderem als Launcher und Übersicht für verschiedene eigenständige Web-Anwendungen (z. B. <code>by-dp.de/Party-Games</code>).
             </p>
             <p>
-                Bitte beachten Sie, dass diese verlinkten Web-Apps eigene, spezifische Datenschutzerklärungen haben können, die die dortigen Datenverarbeitungsprozesse (z. B. durch eigene Funktionen, Interaktionen oder Technologien) regeln. Wir empfehlen Ihnen, die Datenschutzerklärungen der jeweiligen Unterseiten zu prüfen, wenn Sie diese nutzen.
+                Bitte beachten Sie, dass für verlinkte externe Angebote oder separate Anwendungen jeweils die dort hinterlegten, spezifischen Datenschutzerklärungen und Bestimmungen gelten.
             </p>
 
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white">10. Datenweitergabe an externe Dienstleister</h3>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">10. Weitergabe von Daten</h3>
             <p>
-                Eine aktive Weitergabe Ihrer personenbezogenen Daten an externe Dienstleister (außerhalb der unter Punkt 5 genannten automatischen Verarbeitung durch den Hosting-Anbieter GitHub im Rahmen seiner Dienstleistung) für eigene Zwecke findet nicht statt, da keine Funktionen wie Tracking-Tools, Social Media Plugins oder eingebettete Videos von Drittanbietern eingesetzt werden.
+                Eine Übermittlung Ihrer personenbezogenen Daten an Dritte zu anderen als den in dieser Datenschutzerklärung aufgeführten Zwecken findet nicht statt. Wir setzen weder externe Tracking-Dienste, Werbenetzwerke noch Social-Media-Plugins ein.
             </p>
         </div>
     );
