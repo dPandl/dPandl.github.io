@@ -112,6 +112,22 @@ const App: React.FC = () => {
         };
     }, [route.selectedAppId]);
 
+    // Dynamischer Seitentitel für Browser-Tab & Lesezeichen
+    useEffect(() => {
+        if (route.selectedAppId) {
+            const current = projectList.find(p => p.id === route.selectedAppId);
+            if (current) {
+                document.title = `${current.title} | by-dp.de`;
+                return;
+            }
+        }
+        if (route.page === 'apps') {
+            document.title = 'App Hub | by-dp.de';
+        } else {
+            document.title = 'by-dp.de - Digitale Lösungen';
+        }
+    }, [route, projectList]);
+
     const openModal = (modal: ModalType) => setActiveModal(modal);
     const closeModal = () => {
         setActiveModal(null);

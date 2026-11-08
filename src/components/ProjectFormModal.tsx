@@ -9,6 +9,63 @@ interface ProjectFormModalProps {
     projectToEdit?: Project | null;
 }
 
+// Helper to compress images client-side before storing as data URLs (avoids massive JSON payloads)
+async function compressImageFile(file: File, isIcon: boolean): Promise<string> {
+    if (file.type === 'image/svg+xml') {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target?.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    return new Promise((resolve) => {
+        const img = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        img.onload = () => {
+            URL.revokeObjectURL(objectUrl);
+            const maxWidth = isIcon ? 256 : 1600;
+            const maxHeight = isIcon ? 256 : 1000;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxWidth || height > maxHeight) {
+                if (width / height > maxWidth / maxHeight) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                } else {
+                    width = Math.round((width * maxHeight) / height);
+                    height = maxHeight;
+                }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                resolve(objectUrl);
+                return;
+            }
+
+            ctx.drawImage(img, 0, 0, width, height);
+            let dataUrl = canvas.toDataURL('image/webp', isIcon ? 0.88 : 0.80);
+            if (!dataUrl.startsWith('data:image/webp')) {
+                dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+            }
+            resolve(dataUrl);
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(objectUrl);
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target?.result as string);
+            reader.readAsDataURL(file);
+        };
+        img.src = objectUrl;
+    });
+}
+
 const emptyProject: Project = {
     id: '',
     title: '',
@@ -36,6 +93,10 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
     const [formData, setFormData] = useState<Project>(emptyProject);
     const [featureInput, setFeatureInput] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
+    const [copiedJson, setCopiedJson] = useState(false);
+    const [showJsonDrawer, setShowJsonDrawer] = useState(false);
+    const [jsonInputText, setJsonInputText] = useState('');
+    const [jsonFeedback, setJsonFeedback] = useState<{ type: 'success' | 'error'; msg: string } | null>(null);
 
     useEffect(() => {
         if (isOpen) {
@@ -56,6 +117,8 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
             }
             setFeatureInput('');
             setErrorMsg('');
+            setShowJsonDrawer(false);
+            setJsonFeedback(null);
         }
     }, [isOpen, projectToEdit]);
 
@@ -63,15 +126,14 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-    // Convert image file to base64 data url
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, isIcon: boolean) => {
+    // Convert image file to compressed base64 data url
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, isIcon: boolean) => {
         const files = e.target.files;
         if (!files || files.length === 0) return;
 
-        Array.from(files).forEach(file => {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const base64 = event.target?.result as string;
+        for (const file of Array.from(files)) {
+            try {
+                const base64 = await compressImageFile(file, isIcon);
                 if (isIcon) {
                     setFormData(prev => ({ ...prev, icon: base64 }));
                 } else {
@@ -80,12 +142,92 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
                         screenshots: [...(prev.screenshots || []), base64]
                     }));
                 }
-            };
-            reader.readAsDataURL(file);
-        });
+            } catch (err) {
+                console.warn('Bildverarbeitung fehlgeschlagen:', err);
+            }
+        }
 
         // Reset file input
         e.target.value = '';
+    };
+
+    // JSON Export & Import Helpers
+    const handleCopyJson = () => {
+        const jsonStr = JSON.stringify(formData, null, 2);
+        navigator.clipboard.writeText(jsonStr);
+        setCopiedJson(true);
+        setTimeout(() => setCopiedJson(false), 2500);
+    };
+
+    const handleDownloadJson = () => {
+        const jsonStr = JSON.stringify(formData, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${formData.id || 'app'}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const applyParsedJson = (parsed: any) => {
+        if (!parsed || typeof parsed !== 'object') {
+            throw new Error('Ungültiges JSON-Objekt.');
+        }
+        if (!parsed.title && !parsed.id) {
+            throw new Error('Das JSON muss mindestens eine "id" oder einen "title" enthalten.');
+        }
+
+        setFormData(prev => ({
+            ...prev,
+            ...parsed,
+            features: Array.isArray(parsed.features) ? parsed.features : prev.features || [],
+            screenshots: Array.isArray(parsed.screenshots) ? parsed.screenshots : prev.screenshots || [],
+            downloadUrls: parsed.downloadUrls ? { ...(prev.downloadUrls || {}), ...parsed.downloadUrls } : prev.downloadUrls
+        }));
+
+        setJsonFeedback({
+            type: 'success',
+            msg: `App "${parsed.title || parsed.id}" erfolgreich aus JSON importiert! Bitte überprüfe die Felder und klicke auf Speichern.`
+        });
+        setTimeout(() => setJsonFeedback(null), 5000);
+    };
+
+    const handleImportJsonFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const text = event.target?.result as string;
+                const parsed = JSON.parse(text);
+                applyParsedJson(parsed);
+                setShowJsonDrawer(false);
+            } catch (err: any) {
+                setJsonFeedback({
+                    type: 'error',
+                    msg: 'Fehler beim Parsen der Datei: ' + (err.message || 'Ungültiges JSON')
+                });
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+    };
+
+    const handleImportJsonText = () => {
+        if (!jsonInputText.trim()) return;
+        try {
+            const parsed = JSON.parse(jsonInputText);
+            applyParsedJson(parsed);
+            setJsonInputText('');
+            setShowJsonDrawer(false);
+        } catch (err: any) {
+            setJsonFeedback({
+                type: 'error',
+                msg: 'Ungültiges JSON: ' + (err.message || 'Syntaxfehler')
+            });
+        }
     };
 
     const handleAddFeature = () => {
@@ -136,6 +278,107 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ isOpen, onClose, on
     return (
         <Modal isOpen={isOpen} onClose={onClose} title={projectToEdit ? `App bearbeiten: ${projectToEdit.title}` : 'Neue App hinzufügen'}>
             <form onSubmit={handleSubmit} className="space-y-6">
+                {/* KI & JSON Export / Import Toolbar */}
+                <div className="p-3 sm:p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex flex-col gap-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm font-bold text-cyan-700 dark:text-cyan-300 flex items-center gap-1.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                                </svg>
+                                KI &amp; JSON Datenaustausch
+                            </span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <button
+                                type="button"
+                                onClick={handleCopyJson}
+                                className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm transition-all flex items-center gap-1.5"
+                                title="Kopiert die aktuellen Formulardaten als JSON in die Zwischenablage für deine Coding-KI"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                                {copiedJson ? 'Kopiert! ✓' : 'JSON kopieren'}
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={handleDownloadJson}
+                                className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 shadow-sm transition-all flex items-center gap-1.5"
+                                title="Speichert die App-Daten als .json Datei auf deinem Computer"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-cyan-600 dark:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                JSON herunterladen
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() => setShowJsonDrawer(!showJsonDrawer)}
+                                className="px-3 py-1.5 text-xs font-bold rounded-xl bg-cyan-500 hover:bg-cyan-600 text-white shadow-sm transition-all flex items-center gap-1.5"
+                                title="JSON von deiner Coding-KI importieren oder einfügen"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                {showJsonDrawer ? 'Import schließen' : 'JSON importieren'}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Import Drawer */}
+                    {showJsonDrawer && (
+                        <div className="pt-3 border-t border-cyan-500/20 space-y-3">
+                            <p className="text-xs text-gray-600 dark:text-gray-300">
+                                Lade eine von deiner Coding-KI erstellte <code>.json</code>-Datei hoch oder füge den JSON-Code direkt hier ein:
+                            </p>
+                            
+                            <div className="flex flex-col sm:flex-row gap-3 items-stretch">
+                                <label className="cursor-pointer px-4 py-2 text-xs font-semibold rounded-xl bg-white dark:bg-gray-800 border border-dashed border-cyan-500/50 hover:border-cyan-500 text-center flex items-center justify-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                    </svg>
+                                    JSON-Datei auswählen
+                                    <input
+                                        type="file"
+                                        accept=".json,application/json"
+                                        onChange={handleImportJsonFile}
+                                        className="hidden"
+                                    />
+                                </label>
+                            </div>
+
+                            <div>
+                                <textarea
+                                    rows={4}
+                                    placeholder='Oder füge hier das JSON deiner Coding-KI ein: {"id": "...", "title": "...", "features": [...]}'
+                                    value={jsonInputText}
+                                    onChange={(e) => setJsonInputText(e.target.value)}
+                                    className="w-full px-3 py-2 text-xs font-mono rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white"
+                                />
+                                <div className="flex justify-end mt-2">
+                                    <button
+                                        type="button"
+                                        disabled={!jsonInputText.trim()}
+                                        onClick={handleImportJsonText}
+                                        className="px-4 py-1.5 text-xs font-bold rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white disabled:opacity-40 transition-all"
+                                    >
+                                        Eingefügtes JSON anwenden
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {jsonFeedback && (
+                        <div className={`p-3 rounded-xl text-xs font-semibold ${jsonFeedback.type === 'success' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'}`}>
+                            {jsonFeedback.msg}
+                        </div>
+                    )}
+                </div>
+
                 {errorMsg && (
                     <div className="p-4 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-sm font-semibold">
                         {errorMsg}

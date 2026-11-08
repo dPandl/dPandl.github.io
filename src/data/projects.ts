@@ -40,6 +40,9 @@ export const initialProjects: Project[] = [];
 let cachedProjects: Project[] | null = null;
 let fetchPromise: Promise<Project[]> | null = null;
 
+// Cache for GitHub release info to prevent hitting the 60 requests/hour IP rate limit
+const releaseCache = new Map<string, { data: any; timestamp: number }>();
+
 // Helper to enrich projects with live GitHub release details if githubRepo is specified
 async function enrichWithGitHubReleases(projectsList: Project[]): Promise<Project[]> {
     return Promise.all(
@@ -54,10 +57,20 @@ async function enrichWithGitHubReleases(projectsList: Project[]): Promise<Projec
 
                 if (!cleanRepo) return project;
 
-                // Fetch latest release from GitHub API (public API, no auth required)
-                const res = await fetch(`https://api.github.com/repos/${cleanRepo}/releases/latest`);
-                if (res.ok) {
-                    const release = await res.json();
+                // Check cache first (valid for 1 hour)
+                let release: any = null;
+                const cached = releaseCache.get(cleanRepo);
+                if (cached && Date.now() - cached.timestamp < 1000 * 60 * 60) {
+                    release = cached.data;
+                } else {
+                    const res = await fetch(`https://api.github.com/repos/${cleanRepo}/releases/latest`);
+                    if (res.ok) {
+                        release = await res.json();
+                        releaseCache.set(cleanRepo, { data: release, timestamp: Date.now() });
+                    }
+                }
+
+                if (release) {
                     const version = release.tag_name ? release.tag_name.replace(/^v/, '') : project.version;
 
                     let downloadUrl = project.downloadUrl;
@@ -125,21 +138,41 @@ export async function fetchProjects(forceRefresh = false): Promise<Project[]> {
         const adminToken = localStorage.getItem('by_dp_github_token');
         if (adminToken) {
             try {
-                const url = `https://api.github.com/repos/dPandl/dPandl.github.io/contents/projects.json?t=${timestamp}`;
+                // Query file info on main branch with cache-buster
+                const url = `https://api.github.com/repos/dPandl/dPandl.github.io/contents/projects.json?ref=main&t=${timestamp}`;
                 const authHeader = adminToken.startsWith('ghp_') || adminToken.startsWith('github_pat_') ? `Bearer ${adminToken}` : `token ${adminToken}`;
                 const apiRes = await fetch(url, {
                     headers: { 'Authorization': authHeader, 'Accept': 'application/vnd.github.v3+json' }
                 });
                 if (apiRes.ok) {
                     const apiData = await apiRes.json();
+                    let rawText = '';
+
                     if (apiData.content) {
+                        // Standard base64 content (for files <= 1MB)
                         const binary = atob(apiData.content.replace(/\s/g, ''));
                         const bytes = new Uint8Array(binary.length);
                         for (let i = 0; i < binary.length; i++) {
                             bytes[i] = binary.charCodeAt(i);
                         }
-                        const text = new TextDecoder('utf-8').decode(bytes);
-                        const parsed = JSON.parse(text);
+                        rawText = new TextDecoder('utf-8').decode(bytes);
+                    } else if (apiData.sha) {
+                        // For files > 1MB: GitHub Contents API omits content.
+                        // Fetch the raw git blob directly via Git Data API (no size limit, no CDN cache, instant!)
+                        const blobUrl = `https://api.github.com/repos/dPandl/dPandl.github.io/git/blobs/${apiData.sha}`;
+                        const blobRes = await fetch(blobUrl, {
+                            headers: {
+                                'Authorization': authHeader,
+                                'Accept': 'application/vnd.github.raw'
+                            }
+                        });
+                        if (blobRes.ok) {
+                            rawText = await blobRes.text();
+                        }
+                    }
+
+                    if (rawText) {
+                        const parsed = JSON.parse(rawText);
                         if (Array.isArray(parsed) && parsed.length > 0) {
                             const enriched = await enrichWithGitHubReleases(parsed);
                             cachedProjects = enriched;

@@ -66,6 +66,17 @@ const AppsPage: React.FC<AppsPageProps> = ({
         setIsReloading(false);
     };
 
+    const handleExportAllJson = () => {
+        const jsonStr = JSON.stringify(projectList, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `projects-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
     // Automatically extract all unique categories present in the projects list
     const dynamicCategories = useMemo(() => {
         const set = new Set<string>();
@@ -106,6 +117,31 @@ const AppsPage: React.FC<AppsPageProps> = ({
         }
     };
 
+    const searchInputRef = React.useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Focus search on "/" keypress when not typing in an input
+            if (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                searchInputRef.current?.focus();
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
+    // Category counts for pill badges
+    const categoryCounts = useMemo(() => {
+        const counts: Record<string, number> = { 'Alle': projectList.length };
+        projectList.forEach(p => {
+            if (p.category) {
+                counts[p.category] = (counts[p.category] || 0) + 1;
+            }
+        });
+        return counts;
+    }, [projectList]);
+
     return (
         <div className="container mx-auto px-4 py-8 sm:py-14">
             {/* Header Banner */}
@@ -131,22 +167,25 @@ const AppsPage: React.FC<AppsPageProps> = ({
                         <div className="absolute top-0 right-0 -mt-10 -mr-10 w-96 h-96 bg-white/10 rounded-full blur-3xl pointer-events-none" />
                         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
                             <div className="space-y-4 max-w-xl">
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 fill-current" viewBox="0 0 20 20">
+                                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider shadow-xs">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-amber-300 fill-current" viewBox="0 0 20 20">
                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                     </svg>
                                     App des Monats
                                 </span>
-                                <h2 className="text-3xl sm:text-4xl font-extrabold">{featuredApp.title}</h2>
-                                <p className="text-cyan-100 text-lg">{featuredApp.tagline}</p>
+                                <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">{featuredApp.title}</h2>
+                                <p className="text-white/90 text-lg leading-relaxed">{featuredApp.tagline}</p>
                                 <div className="pt-2 flex items-center gap-4 text-sm font-semibold">
-                                    <span className="px-5 py-2.5 bg-white text-cyan-900 rounded-2xl shadow-lg group-hover:bg-cyan-50 transition-colors">
-                                        Details im App Hub ansehen
+                                    <span className="px-6 py-3 bg-white text-gray-900 rounded-2xl shadow-xl group-hover:bg-gray-100 transition-colors flex items-center gap-2 font-bold">
+                                        Details ansehen
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
                                     </span>
                                 </div>
                             </div>
 
-                            <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-3xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-4xl sm:text-5xl font-extrabold shadow-xl shrink-0 overflow-hidden">
+                            <div className="w-24 h-24 sm:w-36 sm:h-36 rounded-3xl bg-white/15 backdrop-blur-md border border-white/25 flex items-center justify-center text-4xl sm:text-5xl font-extrabold shadow-2xl shrink-0 overflow-hidden ring-1 ring-white/20">
                                 {featuredApp.icon ? (
                                     <img 
                                         src={featuredApp.icon} 
@@ -163,63 +202,97 @@ const AppsPage: React.FC<AppsPageProps> = ({
             )}
 
             {/* Search and Filter Section */}
-            <div className="max-w-4xl mx-auto mb-12 space-y-6">
-                <div className="flex flex-col sm:flex-row gap-3 items-center">
-                    <div className="relative flex-grow w-full">
-                        <input
-                            type="text"
-                            placeholder="Nach Apps, Kategorien oder Funktionen suchen..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full px-6 py-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all dark:text-white text-lg placeholder-gray-400"
-                        />
-                        <div className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <div className="max-w-4xl mx-auto mb-12 space-y-3">
+                {/* Clean, right-aligned admin buttons without the bulky frame */}
+                {isAdmin && (
+                    <div className="flex justify-end items-center gap-2">
+                        <button
+                            onClick={handleReload}
+                            disabled={isReloading}
+                            title="projekte.json neu vom Server / GitHub laden"
+                            className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 transition-all flex items-center gap-1.5 shadow-xs disabled:opacity-50"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className={`h-3.5 w-3.5 ${isReloading ? 'animate-spin text-cyan-500' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                             </svg>
-                        </div>
-                    </div>
+                            {isReloading ? 'Lädt...' : 'Neu laden'}
+                        </button>
 
-                    {isAdmin && (
-                        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                            <button
-                                onClick={handleReload}
-                                disabled={isReloading}
-                                title="projekte.json neu vom Server / GitHub laden"
-                                className="w-full sm:w-auto px-5 py-4 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 font-bold rounded-2xl border border-cyan-500/20 transition-all shrink-0 flex items-center justify-center gap-2 text-base disabled:opacity-50"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className={`h-5 w-5 ${isReloading ? 'animate-spin' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
-                                {isReloading ? 'Lade neu...' : 'JSON neu laden'}
-                            </button>
-                            <button
-                                onClick={onAddNewApp}
-                                className="w-full sm:w-auto px-6 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/25 transition-all shrink-0 flex items-center justify-center gap-2 text-base"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                                </svg>
-                                Neue App hinzufügen
-                            </button>
-                        </div>
+                        <button
+                            onClick={handleExportAllJson}
+                            title="Alle Apps als projects.json exportieren (für Coding-KI oder Backup)"
+                            className="px-3 py-1.5 text-xs font-semibold rounded-xl bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 transition-all flex items-center gap-1.5 shadow-xs"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            Alle JSON
+                        </button>
+
+                        <button
+                            onClick={onAddNewApp}
+                            className="px-3.5 py-1.5 text-xs font-bold rounded-xl bg-cyan-500 hover:bg-cyan-600 text-white shadow-sm shadow-cyan-500/20 transition-all flex items-center gap-1.5"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                            </svg>
+                            Neue App
+                        </button>
+                    </div>
+                )}
+
+                {/* Symmetrical, Full-Width Search Input */}
+                <div className="relative w-full">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                    <input
+                        ref={searchInputRef}
+                        type="text"
+                        placeholder="Apps durchsuchen..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-12 pr-10 py-3.5 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border border-gray-200 dark:border-gray-700/80 rounded-2xl shadow-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all dark:text-white text-base placeholder-gray-400"
+                    />
+                    {searchQuery && (
+                        <button
+                            type="button"
+                            onClick={() => setSearchQuery('')}
+                            className="absolute right-3.5 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-500 dark:text-gray-300 flex items-center justify-center text-sm font-bold transition-colors"
+                            title="Suche zurücksetzen"
+                        >
+                            ✕
+                        </button>
                     )}
                 </div>
 
-                <div className="flex flex-wrap justify-center gap-3">
-                    {dynamicCategories.map((cat) => (
-                        <button
-                            key={cat}
-                            onClick={() => setActiveCategory(cat)}
-                            className={`px-6 py-2.5 rounded-2xl font-semibold transition-all duration-300 ${
-                                activeCategory === cat
-                                    ? 'bg-cyan-500 text-white shadow-lg shadow-cyan-500/25 scale-105'
-                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
-                            }`}
-                        >
-                            {cat}
-                        </button>
-                    ))}
+                <div className="flex flex-wrap justify-center gap-2 sm:gap-2.5">
+                    {dynamicCategories.map((cat) => {
+                        const count = categoryCounts[cat] || 0;
+                        const isActive = activeCategory === cat;
+                        return (
+                            <button
+                                key={cat}
+                                onClick={() => setActiveCategory(cat)}
+                                className={`px-4 sm:px-5 py-2 rounded-2xl font-semibold text-sm transition-all duration-200 flex items-center gap-2 ${
+                                    isActive
+                                        ? 'bg-cyan-500 text-white shadow-md shadow-cyan-500/25 ring-2 ring-cyan-500/50'
+                                        : 'bg-white/80 dark:bg-gray-800/80 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-750'
+                                }`}
+                            >
+                                <span>{cat}</span>
+                                <span className={`text-xs px-2 py-0.5 rounded-full font-mono ${
+                                    isActive 
+                                        ? 'bg-white/20 text-white' 
+                                        : 'bg-gray-100 dark:bg-gray-700/80 text-gray-500 dark:text-gray-400'
+                                }`}>
+                                    {count}
+                                </span>
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
 
@@ -256,13 +329,25 @@ const AppsPage: React.FC<AppsPageProps> = ({
                     ))}
                 </div>
             ) : (
-                <div className="text-center py-20">
-                    <div className="text-gray-400 mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 9.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <div className="text-center py-16 px-4">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                     </div>
-                    <p className="text-xl text-gray-500 dark:text-gray-400">Keine Apps gefunden, die deiner Suche entsprechen.</p>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Keine Apps gefunden</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm mx-auto">
+                        {searchQuery ? `Für "${searchQuery}" gibt es leider keine Treffer.` : 'In dieser Kategorie sind derzeit keine Apps vorhanden.'}
+                    </p>
+                    <button
+                        onClick={() => {
+                            setSearchQuery('');
+                            setActiveCategory('Alle');
+                        }}
+                        className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-600 text-white font-semibold text-sm shadow-sm transition-all"
+                    >
+                        Filter &amp; Suche zurücksetzen
+                    </button>
                 </div>
             )}
         </div>

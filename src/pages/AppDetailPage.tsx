@@ -15,6 +15,25 @@ interface AppDetailPageProps {
 const AppDetailPage: React.FC<AppDetailPageProps> = ({ app, onBack, isAdmin, onEditApp, onDeleteApp }) => {
     const { isMobile } = useDeviceType();
     const [selectedScreenshotIndex, setSelectedScreenshotIndex] = useState<number | null>(null);
+    const [copiedJson, setCopiedJson] = useState<boolean>(false);
+
+    const handleCopyAppJson = () => {
+        const jsonStr = JSON.stringify(app, null, 2);
+        navigator.clipboard.writeText(jsonStr);
+        setCopiedJson(true);
+        setTimeout(() => setCopiedJson(false), 2500);
+    };
+
+    const handleDownloadAppJson = () => {
+        const jsonStr = JSON.stringify(app, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${app.id || 'app'}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
 
     const screenshots = app.screenshots || [];
 
@@ -117,26 +136,52 @@ const AppDetailPage: React.FC<AppDetailPageProps> = ({ app, onBack, isAdmin, onE
                     {/* Action Buttons ("Öffnen", "Herunterladen") & Admin Buttons */}
                     <div className="flex flex-col gap-3 w-full md:w-auto shrink-0 pt-4 md:pt-0 border-t md:border-t-0 border-gray-100 dark:border-gray-700 items-stretch md:items-end">
                         {isAdmin && (
-                            <div className="flex items-center gap-2 mb-2 w-full">
-                                <button
-                                    onClick={() => onEditApp && onEditApp(app)}
-                                    className="flex-1 px-4 py-2.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                    </svg>
-                                    Bearbeiten
-                                </button>
+                            <div className="flex flex-col gap-2 mb-2 w-full">
+                                <div className="flex items-center gap-2 w-full">
+                                    <button
+                                        onClick={() => onEditApp && onEditApp(app)}
+                                        className="flex-1 px-4 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                        Bearbeiten
+                                    </button>
 
-                                <button
-                                    onClick={() => onDeleteApp && onDeleteApp(app)}
-                                    className="px-4 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                    Entfernen
-                                </button>
+                                    <button
+                                        onClick={() => onDeleteApp && onDeleteApp(app)}
+                                        className="px-3 py-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                        Entfernen
+                                    </button>
+                                </div>
+
+                                <div className="flex items-center gap-2 w-full">
+                                    <button
+                                        onClick={handleCopyAppJson}
+                                        className="flex-1 px-3 py-2 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-700 dark:text-cyan-300 border border-cyan-500/30 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                                        title="Kopiert das komplette JSON dieser App in die Zwischenablage für deine Coding-KI"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-cyan-600 dark:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                        </svg>
+                                        {copiedJson ? 'Kopiert! ✓' : 'JSON für KI kopieren'}
+                                    </button>
+
+                                    <button
+                                        onClick={handleDownloadAppJson}
+                                        className="px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                                        title="App als .json Datei herunterladen"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                        .json
+                                    </button>
+                                </div>
                             </div>
                         )}
 
@@ -338,14 +383,19 @@ const AppDetailPage: React.FC<AppDetailPageProps> = ({ app, onBack, isAdmin, onE
                 {/* Features Highlights */}
                 {app.features && app.features.length > 0 && (
                     <div className="bg-white dark:bg-gray-800/80 backdrop-blur-xl border border-gray-200 dark:border-gray-700/80 rounded-3xl p-8 shadow-md">
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Highlights</h2>
+                        <div className="flex items-center gap-2 mb-6">
+                            <span className="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center font-bold text-sm border border-cyan-500/20">
+                                ★
+                            </span>
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Highlights</h2>
+                        </div>
                         <ul className="space-y-3">
                             {app.features.map((feat, idx) => (
-                                <li key={idx} className="flex items-start gap-3 text-gray-700 dark:text-gray-300 text-sm">
-                                    <span className="w-5 h-5 rounded-full bg-cyan-500/10 text-cyan-500 flex items-center justify-center shrink-0 mt-0.5 font-bold">
+                                <li key={idx} className="flex items-start gap-3 p-3.5 rounded-2xl bg-gray-50/80 dark:bg-gray-900/50 border border-gray-100 dark:border-gray-800/80 text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                                    <span className="w-5 h-5 rounded-full bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold">
                                         ✓
                                     </span>
-                                    <span>{feat}</span>
+                                    <span className="font-medium">{feat}</span>
                                 </li>
                             ))}
                         </ul>

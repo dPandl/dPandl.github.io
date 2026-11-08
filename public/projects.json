@@ -69,7 +69,7 @@
     "longDescription": "Mit Griddly kannst du einfach CSV Dateien erstellen, bearbeiten oder zusammenführen.\nGriddly kann ohne installation im Web oder als Programm auf deinem Computer installiert werden.",
     "color": "#1c9247",
     "category": "Tools",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "releaseDate": "14.06.2026",
     "updatedDate": "14.06.2026",
     "supportedPlatforms": "both",
@@ -88,8 +88,8 @@
     ],
     "githubRepo": "dPandl/griddly-csv",
     "downloadUrls": {
-      "linux": "https://github.com/dPandl/griddly-csv/releases/download/v0.0.2/Griddly-CSV-0.0.2-linux.zip",
-      "windows": "https://github.com/dPandl/griddly-csv/releases/download/v0.0.2/Griddly-CSV-0.0.2-win.zip"
+      "linux": "https://github.com/dPandl/griddly-csv/releases/download/v0.0.3/Griddly-CSV-0.0.3-linux.zip",
+      "windows": "https://github.com/dPandl/griddly-csv/releases/download/v0.0.3/Griddly-CSV-0.0.3-win.zip"
     }
   },
   {
@@ -212,9 +212,9 @@
     "longDescription": "Speziell entwickelt für die Anforderungen in Kindergärten und Kitas. Erstellen Sie Schichtmodelle, verwalte Abwesenheiten und behalte die Soll-Stunden des Teams stets übersichtlich im Auge.",
     "color": "#b670f8",
     "category": "Kindergarten",
-    "version": "2.0.3",
+    "version": "2.0.5",
     "releaseDate": "30.05.2025",
-    "updatedDate": "14.10.2026",
+    "updatedDate": "06.11.2026",
     "supportedPlatforms": "desktop",
     "developer": "by-dp",
     "isFeatured": true,
@@ -226,7 +226,8 @@
     "features": [
       "Automatische Warnungen",
       "Voll Anpassbar",
-      "Komplett Offline ausführbar"
+      "Komplett Offline ausführbar",
+      "100% Gratis"
     ],
     "screenshots": []
   },
@@ -240,7 +241,7 @@
     "category": "Kindergarten",
     "version": "0.0.0",
     "releaseDate": "21.08.2025",
-    "updatedDate": "10.09.2026",
+    "updatedDate": "01.11.2026",
     "supportedPlatforms": "desktop",
     "developer": "by-dp",
     "isFeatured": false,

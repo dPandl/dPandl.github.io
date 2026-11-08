@@ -41,22 +41,22 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, activePage }) => {
         setIsMenuOpen(false);
     };
 
-    const navButtonBaseClasses = "px-3 py-1.5 rounded-md font-medium transition-colors duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900";
-    const navButtonActiveClasses = "bg-cyan-500 text-white shadow-sm";
-    const navButtonInactiveClasses = "text-gray-600 dark:text-gray-300 hover:bg-gray-200/60 dark:hover:bg-gray-700/60";
+    const navButtonBaseClasses = "px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500";
+    const navButtonActiveClasses = "bg-cyan-500 text-white shadow-sm shadow-cyan-500/25";
+    const navButtonInactiveClasses = "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100/80 dark:hover:bg-gray-800/80";
 
-    const mobileNavButtonBaseClasses = "w-full text-left p-3 rounded-lg text-lg font-medium transition-colors duration-200";
-    const mobileNavButtonActiveClasses = "bg-cyan-500 text-white";
+    const mobileNavButtonBaseClasses = "w-full text-left p-3.5 rounded-xl text-lg font-semibold transition-colors duration-200";
+    const mobileNavButtonActiveClasses = "bg-cyan-500 text-white shadow-sm";
     const mobileNavButtonInactiveClasses = "text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800";
 
 
     return (
         <>
-            <header className="py-4 px-4 sm:px-6 lg:px-8 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-40 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
+            <header className="py-3.5 px-4 sm:px-6 lg:px-8 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md sticky top-0 z-40 border-b border-gray-200/70 dark:border-gray-800/70 transition-colors duration-300">
                 <div className="container mx-auto flex justify-between items-center">
                     <button 
                         onClick={() => handleNavClick('home')} 
-                        className="focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 rounded-lg -m-2 p-2"
+                        className="focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 rounded-xl -m-2 p-2"
                         aria-label="Zurück zur Startseite"
                     >
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
@@ -65,7 +65,7 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, activePage }) => {
                     </button>
                     
                     {/* Desktop Navigation */}
-                    <nav className="hidden md:flex items-center space-x-2 sm:space-x-4 text-sm sm:text-base">
+                    <nav className="hidden md:flex items-center space-x-1.5 sm:space-x-2 text-sm sm:text-base">
                         {navItems.map(item => (
                              <button 
                                 key={item.page}
@@ -75,13 +75,14 @@ const Header: React.FC<HeaderProps> = ({ onNavigate, activePage }) => {
                                 {item.label}
                             </button>
                         ))}
-                        <div className="h-4 w-px bg-gray-200 dark:bg-gray-700" aria-hidden="true"></div>
+                        <div className="h-5 w-px bg-gray-200 dark:bg-gray-800 mx-2" aria-hidden="true"></div>
                         <button
                             onClick={toggleTheme}
-                            className="text-gray-600 dark:text-gray-300 hover:text-cyan-500 dark:hover:text-cyan-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 rounded-full transition-colors duration-300 p-2"
-                            aria-label="Toggle theme"
+                            className="p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 transition-all"
+                            aria-label="Darstellung wechseln (Hell/Dunkel)"
+                            title={theme === 'light' ? 'Dunkelmodus aktivieren' : 'Hellmodus aktivieren'}
                         >
-                            {theme === 'light' ? <MoonIcon className="h-5 w-5" /> : <SunIcon className="h-5 w-5" />}
+                            {theme === 'light' ? <MoonIcon className="h-5 w-5 text-gray-700" /> : <SunIcon className="h-5 w-5 text-amber-400" />}
                         </button>
                     </nav>
 

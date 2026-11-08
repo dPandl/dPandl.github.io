@@ -40,20 +40,23 @@ const HomePage: React.FC = () => {
         <div className="flex flex-col">
             {/* Hero Section */}
             <section className="relative py-20 sm:py-28 overflow-hidden">
+                {/* Subtle Ambient Radial Glow */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-gradient-to-tr from-cyan-500/15 via-blue-500/10 to-indigo-500/15 blur-3xl pointer-events-none rounded-full -z-10" />
+
                 <div className="container mx-auto px-6 relative z-10 text-center">
-                    <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-8">
-                        Projekte, Apps & <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-600">
+                    <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-6">
+                        Projekte, Apps &amp; <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-600">
                             Digitale Welten
                         </span>
                     </h1>
-                    <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-10 leading-relaxed">
-                        Willkommen auf meiner persönlichen Plattform. Hier erstelle und teile ich nützliche Web-Apps, Community-Server & Modpacks sowie Gedanken in meinem Blog.
+                    <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-10 leading-relaxed font-normal">
+                        Entdecke nützliche, datenschutzfreundliche Web-Anwendungen und Werkzeuge – schnell, intuitiv und direkt im Browser nutzbar.
                     </p>
                     <div className="flex justify-center animate-reveal delay-300">
                         <a 
                             href="#apps" 
-                            className="px-8 py-4 bg-cyan-500 hover:bg-cyan-600 text-white font-bold rounded-2xl shadow-lg shadow-cyan-500/30 transition-all hover:scale-105 flex items-center justify-center gap-2"
+                            className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold rounded-2xl shadow-lg shadow-cyan-500/30 transition-all hover:scale-105 flex items-center justify-center gap-2"
                         >
                             App Hub entdecken
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -115,22 +118,45 @@ const HomePage: React.FC = () => {
             {/* About Section */}
             <section className="py-20">
                 <div className="container mx-auto px-6">
-                    <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-3xl p-10 border border-gray-100 dark:border-gray-700 shadow-xl">
-                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
-                            Über by-dp<span className="text-cyan-500 dark:text-cyan-400">.de</span>
-                        </h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 text-gray-600 dark:text-gray-400">
-                            <div>
-                                <h3 className="text-gray-900 dark:text-white font-bold mb-2">Web Apps & Tools</h3>
-                                <p>Nützliche, datenschutzfreundliche Web-Apps, die ohne Account und komplett lokal im Browser funktionieren.</p>
+                    <div className="max-w-4xl mx-auto bg-white/80 dark:bg-gray-800/80 backdrop-blur-md rounded-3xl p-8 sm:p-12 border border-gray-200/80 dark:border-gray-700/80 shadow-xl">
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 flex items-center justify-center font-bold text-lg border border-cyan-500/20">
+                                ✦
                             </div>
-                            <div>
-                                <h3 className="text-gray-900 dark:text-white font-bold mb-2">Community & Gaming</h3>
-                                <p>Informationen, Modpacks und Tools für Games-Server für Freundeskreise und Gruppen.</p>
+                            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+                                Über by-dp<span className="text-cyan-500 dark:text-cyan-400">.de</span>
+                            </h2>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 text-gray-600 dark:text-gray-400">
+                            <div className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800">
+                                <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center mb-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-gray-900 dark:text-white font-bold text-lg mb-2">Web Apps &amp; Tools</h3>
+                                <p className="text-sm leading-relaxed">Nützliche, datenschutzfreundliche Web-Apps, die ohne Account und komplett lokal im Browser funktionieren.</p>
                             </div>
-                            <div>
-                                <h3 className="text-gray-900 dark:text-white font-bold mb-2">Blog & Artikel</h3>
-                                <p>Erfahrungsberichte, Entwicklungsfortschritte und Tutorials rund um Softwareentwicklung.</p>
+
+                            <div className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800">
+                                <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-500 flex items-center justify-center mb-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-gray-900 dark:text-white font-bold text-lg mb-2">Community &amp; Gaming</h3>
+                                <p className="text-sm leading-relaxed">Werkzeuge, Modpacks und Tools für Spiele-Server und Community-Gruppen.</p>
+                            </div>
+
+                            <div className="p-6 rounded-2xl bg-gray-50 dark:bg-gray-900/60 border border-gray-100 dark:border-gray-800">
+                                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mb-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                                    </svg>
+                                </div>
+                                <h3 className="text-gray-900 dark:text-white font-bold text-lg mb-2">Eigene Software</h3>
+                                <p className="text-sm leading-relaxed">Moderne Softwareentwicklung mit Fokus auf Privatsphäre, Performance und echtem Nutzen im Alltag.</p>
                             </div>
                         </div>
                     </div>
